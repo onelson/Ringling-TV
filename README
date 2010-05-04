@@ -1,0 +1,11 @@
+Ok, so there are some tricks to getting this setup.
+
+1. Bootstrap the project with python bootstrap.py
+2. Run bin/buildout
+3. Copy java-dependencies to the "parts" directory (should give parts/java-dependencies/...)
+4. Run bin/install_fedora
+
+Once setup, you can start the fedora server via ./start-fedora.bash
+After that you can start your django app server.
+
+Don't forget to configure your myproject/local_settings.py before you runserver though!
