@@ -1,0 +1,2 @@
+
+from myproject.settings import *
