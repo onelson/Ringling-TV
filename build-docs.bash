@@ -1,7 +1,9 @@
 START_DIR=`pwd`
 ROOT=`which $0`
-DOCS_DIR=`dirname $ROOT`/docs
+ROOT=`dirname $ROOT`
+PATH=$ROOT/bin:$PATH
+DOCS=$ROOT/docs
 export DJANGO_SETTINGS_MODULE=myproject.local_settings
-PATH=$DOCS_DIR/../bin:$PATH
-make --directory=$DOCS_DIR "$@"
+echo "Building docs in [$DOCS]"
+sphinx-build -b html -d $DOCS/_build/doctrees $DOCS $DOCS/_build/html
 echo 'Done.'
