@@ -49,12 +49,12 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'myproject.urls'
 
 
-INSTALLED_APPS = (
+INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.admin',
-)
+]
 
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
