@@ -74,3 +74,6 @@ class Command(NoArgsCommand):
         comp.checksumType = u('DISABLED')
         comp.versionable = False
         comp.setContent()
+        
+        # Done
+        sys.exit(0)
