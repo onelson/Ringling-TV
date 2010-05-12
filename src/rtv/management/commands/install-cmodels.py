@@ -51,6 +51,7 @@ class Command(NoArgsCommand):
             username=settings.RTV_FEDORA_USER, 
             password=settings.RTV_FEDORA_PASSWORD)
         client = FedoraClient(connection)
+
         obj = client.createObject(pp('EPISODE'), 
             label=u('Content Model for video objects'))
         obj.versionable = False
@@ -61,11 +62,15 @@ class Command(NoArgsCommand):
             type = u('uri'),
             value = u('info:fedora/fedora-system:ContentModel-3.0')
             ))
+        rels.checksumType = u('DISABLED')
+        rels.versionable = False
         rels.setContent()
         
-        obj.addDataStream(u('DS-COMPOSITE-MODEL'),_EPISODE_DS_COMP_MODEL, 
+        comp = obj.addDataStream(u('DS-COMPOSITE-MODEL'),_EPISODE_DS_COMP_MODEL, 
             label=u('datastream composite model'),
             formatURI=u('info:fedora/fedora-system:FedoraDSCompositeModel-1.0'), 
             logMessage=u('adding ds comp model'))
         
-        
+        comp.checksumType = u('DISABLED')
+        comp.versionable = False
+        comp.setContent()
