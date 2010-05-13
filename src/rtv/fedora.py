@@ -3,6 +3,7 @@ from fcrepo.utils import NS
 from fcrepo.connection import Connection
 from fcrepo.client import FedoraClient
 
+u = unicode # shortcut
 pp = lambda x: u(settings.RTV_PID_NAMESPACE+':'+x) # prefix pid namespace 
 
 def get_client():

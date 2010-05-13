@@ -6,9 +6,7 @@ the fedora repo.
 import sys
 from django.core.management.base import CommandError, NoArgsCommand
 import rtv.fedora
-from rtv.fedora import NS, pp
-
-u = unicode # shortcut
+from rtv.fedora import NS, pp, u
 
 _EPISODE_DS_COMP_MODEL = u(
 """<dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#">
