@@ -6,4 +6,22 @@ RTV_FEDORA_USER = getattr(settings,'RTV_FEDORA_USER', 'fedoraAdmin')
 RTV_FEDORA_PASSWORD = getattr(settings,'RTV_FEDORA_PASSWORD', 'fedoraAdmin')
 RTV_PID_NAMESPACE = getattr(settings, 'RTV_PID_NAMESPACE', 'rtv')
 
+RTV_FFMPEG = getattr(settings, 'RTV_FFMPEG', '/usr/bin/ffmpeg')
+RTV_FFMPEG2THEORA = getattr(settings, 'RTV_FFMPEG2THEORA', 
+    '/usr/bin/ffmpeg2theora')
+
 FEDORA_INSTANCE = RTV_FEDORA_HOST+'/'+RTV_FEDORA_CONTEXT
+
+class ConfigurationError(Exception):pass
+from subprocess import check_call
+
+def check_bins():
+    try:
+        check_call([RTV_FFMPEG, '-version'])
+    except OSError:
+        raise ConfigurationError('Unable to call ffmpeg at [%s]' % RTV_FFMPEG)
+    try:
+        check_call([RTV_FFMPEG2THEORA])
+    except OSError:
+        raise ConfigurationError('Unable to call ffmpeg2theora at [%s]' % 
+            RTV_FFMPEG2THEORA)
