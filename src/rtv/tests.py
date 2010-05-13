@@ -17,6 +17,8 @@ class VideoModelTest(TestCase):
 
     def testCanCreate(self):
         raise NotImplementedError
+    def testCanGet(self):
+        raise NotImplementedError
     def testCanTranscode(self):
         raise NotImplementedError
     def testCanSendToFedora(self):
