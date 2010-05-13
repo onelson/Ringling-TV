@@ -5,14 +5,10 @@ the fedora repo.
 
 import sys
 from django.core.management.base import CommandError, NoArgsCommand
-from rtv import settings
-from fcrepo.connection import Connection
-from fcrepo.client import FedoraClient
-from fcrepo.utils import NS
-
+import rtv.fedora
+from rtv.fedora import NS, pp
 
 u = unicode # shortcut
-pp = lambda x: u(settings.RTV_PID_NAMESPACE+':'+x) # prefix pid namespace 
 
 _EPISODE_DS_COMP_MODEL = u(
 """<dsCompositeModel xmlns="info:fedora/fedora-system:def/dsCompositeModel#">
@@ -47,14 +43,10 @@ _EPISODE_DS_COMP_MODEL = u(
 class Command(NoArgsCommand):
     help = 'add required content models to fedora repo'
     def handle_noargs(self, *args, **kwargs):
-        connection = Connection(settings.FEDORA_INSTANCE, 
-            username=settings.RTV_FEDORA_USER, 
-            password=settings.RTV_FEDORA_PASSWORD)
-        client = FedoraClient(connection)
+        client = rtv.fedora.get_client()
 
         obj = client.createObject(pp('EPISODE'), 
             label=u('Content Model for video objects'))
-        obj.versionable = False
         
         obj.addDataStream(u('RELS-EXT'))
         rels = obj['RELS-EXT']
@@ -63,17 +55,13 @@ class Command(NoArgsCommand):
             value = u('info:fedora/fedora-system:ContentModel-3.0')
             ))
         rels.checksumType = u('DISABLED')
-        rels.versionable = False
         rels.setContent()
         
-        comp = obj.addDataStream(u('DS-COMPOSITE-MODEL'),_EPISODE_DS_COMP_MODEL, 
+        obj.addDataStream(u('DS-COMPOSITE-MODEL'),_EPISODE_DS_COMP_MODEL, 
             label=u('datastream composite model'),
             formatURI=u('info:fedora/fedora-system:FedoraDSCompositeModel-1.0'), 
             logMessage=u('adding ds comp model'))
-        
+        comp = obj['DS-COMPOSITE-MODEL']
         comp.checksumType = u('DISABLED')
-        comp.versionable = False
-        comp.setContent()
-        
         # Done
         sys.exit(0)
