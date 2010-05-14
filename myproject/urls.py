@@ -10,6 +10,7 @@ urlpatterns = patterns(
     '',
     (r'^admin/(.*)', admin.site.root),
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
+    (r'^rtv/', include('rtv.urls')),
 )
 
 if settings.SERVE_STATIC_MEDIA:

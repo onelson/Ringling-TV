@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+{% block title %}
+<title>{{title}}</title>
+{% endblock title %}
+<body>
+<h1>{{title}}</h1>
+{% block content %}
+{{content}}
+{% endblock content %}
+{% if rtv_version %}
+<h6></h6><em>rtv version: {{rtv_version}}</em></h6>
+{% endif %}
+</body>
+</html>
