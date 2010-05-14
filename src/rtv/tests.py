@@ -2,6 +2,9 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 import rtv.fedora
 from rtv.models import Video
+import unittest
+
+from rtv.models import Video
 import tempfile, os
 
 class FedoraServerTest(TestCase):
@@ -12,7 +15,7 @@ class FedoraServerTest(TestCase):
     def testCanTalkToFedoraServer(self):
         client = rtv.fedora.get_client()
 
-class VideoModelTest(TestCase):
+class VideoModelTest(unittest.TestCase):
     fixtures = ['test_users']
     
     def createFakeVid(self):
@@ -36,17 +39,21 @@ class VideoModelTest(TestCase):
         self.createFakeVid()
 
     def testCanCreate(self):
+        self.user.video = Video.objects.create(name='testUpload')
+        self.user.video.save()
         self.assertTrue(os.path.exists(self.created_vid['path']))
     def testCanGet(self):
+        self.user.getvideo = Video.objects.get(name='testUpload')
         obj = Video.objects.get(pk=self.created_vid['pk'])
         self.assertEqual(os.path.getsize(obj.video.path), self.created_vid['size'])
-    
+
     def testCanTranscode(self):
         raise NotImplementedError
     def testCanSendToFedora(self):
         raise NotImplementedError
     
     def testCanDelete(self):
+        self.user.video.delete()
         obj = Video.objects.get(pk=self.created_vid['pk'])
         obj.delete()
         self.assertFalse(os.path.exists(self.created_vid['path']))
