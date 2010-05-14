@@ -11,6 +11,7 @@ urlpatterns = patterns(
     (r'^admin/(.*)', admin.site.root),
     (r'^accounts/login/$', 'django.contrib.auth.views.login'),
     (r'^rtv/', include('rtv.urls')),
+    (r'^$', 'django.views.generic.simple.redirect_to', {'url':'/rtv/'})
 )
 
 if settings.SERVE_STATIC_MEDIA:
