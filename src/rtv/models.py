@@ -5,14 +5,27 @@ from django.contrib.auth.models import User
 
 
 class Video(models.Model):
+    STATUS_PENDING = 1
+    STATUS_PROCESSING = 2
+    STATUS_PROCESSED = 3
+    STATUS_ERROR = 4
+    STATUS_CHOICES = (
+        (STATUS_PENDING, 'pending'),
+        (STATUS_PROCESSING, 'processing'),
+        (STATUS_PROCESSED, 'processed'),
+        (STATUS_ERROR, 'error'),
+    )
     user = models.ForeignKey(User, editable=False)                                           #user doing the upload (request.user)
     title = models.CharField(max_length=100, editable=True)                                                 #video title
     video = models.FileField(upload_to='uploads', editable=True)                                  #the uploaded video
-    video_flv = models.FileField(upload_to='processed_videos', editable=False, null=True)                                  #the processed video
-    uploaded_date = models.DateTimeField(auto_now_add=True, editable=False, null=False)      #datetime the initial save() was called for this video
+    video_flv = models.FileField(upload_to='processed_videos', editable=False, 
+        null=True)                                  #the processed video
+    uploaded_date = models.DateTimeField(auto_now_add=True, editable=False, 
+        null=False)      #datetime the initial save() was called for this video
     process_start = models.DateTimeField(editable=False, null=True)                          #datetime status was set to 'processing'
     process_end = models.DateTimeField(editable=False, null=True)                            #datetime status was set to 'processed'
-    status = models.IntegerField(editable=False, null=False)                                 #status code
+    status = models.SmallIntegerField(choices=STATUS_CHOICES, 
+        default=STATUS_PENDING, editable=False)                                 #status code
     
 class FileUploadHandler(object):
     def new_file(self, content_type):
