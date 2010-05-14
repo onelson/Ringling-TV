@@ -4,6 +4,6 @@ handler500 # Pyflakes
 urlpatterns = patterns(
     'rtv.views',
     url(r'^$', 'demo', name='demo_view'),
-    url(r'^upload', 'upload', name='upload_view')
-    url(r'^upload', 'success', name='success_view')
+    url(r'^upload/$', 'upload', name='upload_view'),
+    url(r'^success/$', 'success', name='success_view'),
 )
