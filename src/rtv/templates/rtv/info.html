@@ -1,0 +1,16 @@
+{% block content %}
+<h2>Jobs: {{jobs.length}}</h2>
+<table>
+	<tr>
+		<td>title</td>
+		<td>status</td>
+		<td>created</td>
+	</tr>
+{% for job in jobs %}
+<tr>
+	<td>{{job.title}}</td>
+	<td>{{job.get_status_display}}</td>
+	<td>{{job.created|date}} {{job.created|time}}</td>
+</tr>
+{% endfor %}
+{% endblock content %}
