@@ -1,9 +1,12 @@
 <!DOCTYPE HTML>
 <html>
+<head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
 {% block title %}
 <title>{{title}}</title>
 {% endblock title %}
+<script type="text/javascript" src="{{MEDIA_URL}}flowplayer/flowplayer-3.2.0.min.js"></script>
+</head>
 <body>
 <h1>{{title}}</h1>
 {% block content %}

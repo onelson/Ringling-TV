@@ -1,11 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
+
 {% for vid in vids %}
 <div>
 <video poster="{{vid.thumbnail.url}}" controls="controls" >
     <source src="{{vid.ogv.url}}" />
     <source src="{{vid.mp4.url}}" />
 </video>
+<a href="{{vid.mp4.url}}" id="player"></a>
 </div>
 {% endfor %}
+<script>
+	flowplayer("player", "{{MEDIA_URL}}flowplayer/flowplayer-3.2.1.swf");
+</script>
+
 {% endblock content %}
