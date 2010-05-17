@@ -7,8 +7,8 @@
     <source src="{{vid.ogv.url}}" />
     <source src="{{vid.mp4.url}}" />
 </video>
-<a href="{{vid.mp4.url}}" id="player"></a>
 </div>
+<a href="{{vid.mp4.url}}" id="player"></a>
 {% endfor %}
 <script>
 	flowplayer("player", "{{MEDIA_URL}}flowplayer/flowplayer-3.2.1.swf");
