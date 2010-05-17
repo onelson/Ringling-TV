@@ -4,11 +4,11 @@
 {% for vid in vids %}
 <div>
 <video poster="{{vid.thumbnail.url}}" controls="controls" >
-    <source src="{{vid.ogv.url}}" />
-    <source src="{{vid.mp4.url}}" />
+    <source src="{{vid.ogv.url}}" type="video/ogg" />
+    <source src="{{vid.mp4.url}}" type="video/mp4" />
 </video>
 </div>
-<a href="{{vid.mp4.url}}" id="player" style="display:block;width:1280px;height:720px;" ></a>
+<a href="{{vid.mp4.url}}" id="player" style="display:block;width:1280px;height:544px;" ></a>
 {% endfor %}
 <script>
 	flowplayer("player", "{{MEDIA_URL}}flowplayer/flowplayer-3.2.1.swf");
