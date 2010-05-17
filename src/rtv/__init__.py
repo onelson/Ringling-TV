@@ -45,12 +45,3 @@ def get_version():
     if __VERSION__:
         return __VERSION__
     return get_svn_revision()
-
-from rtv import settings
-from fcrepo.connection import Connection
-from fcrepo.client import FedoraClient
-def get_fc_client():
-    connection = Connection(settings.FEDORA_INSTANCE, 
-            username=settings.RTV_FEDORA_USER, 
-            password=settings.RTV_FEDORA_PASSWORD)
-    return FedoraClient(connection)
