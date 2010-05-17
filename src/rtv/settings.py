@@ -25,3 +25,5 @@ def check_bins():
     except OSError:
         raise ConfigurationError('Unable to call ffmpeg2theora at [%s]' % 
             RTV_FFMPEG2THEORA)
+        
+check_bins()

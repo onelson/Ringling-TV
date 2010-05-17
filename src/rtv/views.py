@@ -9,7 +9,9 @@ from django.core.files import File
             
 def demo(request):
     return render_to_response('rtv/demo.html',
-        {'rtv_version': rtv.get_version(),'title': "This is the rtv demo page"}, 
+        {'rtv_version': rtv.get_version(),'title': "This is the rtv demo page", 
+            'vids': TranscodeJob.objects.filter(
+                status=TranscodeJob.STATUS_PROCESSED)}, 
         RequestContext(request))
 
 def upload(request):

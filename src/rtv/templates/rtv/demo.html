@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
-<video controls="controls" src="http://enso.ringling.edu/~owen/flowplayer/tmp/out.ogg">
+{% for vid in vids %}
+<div>
+<video poster="{{vid.thumbnail.url}}" controls="controls" >
+    <source src="{{vid.ogv.url}}" />
+    <source src="{{vid.mp4.url}}" />
 </video>
+</div>
+{% endfor %}
 {% endblock content %}

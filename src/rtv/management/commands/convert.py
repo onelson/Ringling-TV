@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 import sys, os
 
-from rtv.transcoder import jpeg, flash, theora, h264
+from rtv.transcoder import jpeg, theora, h264
 
 # binding converter functions to 'format' command line options
 convert = {

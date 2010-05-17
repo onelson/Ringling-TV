@@ -7,7 +7,7 @@ import datetime, os
 from uuid import uuid4
 import rtv.fedora
 from rtv.fedora import u, pp, NS
-from rtv.transcoder import theora, h264, jpeg
+from rtv.transcoder import theora, h264, jpeg, TranscodeError
 from rtv.settings import RTV_PID_NAMESPACE
 
 def upload_dst(instance, filename):
@@ -48,18 +48,20 @@ class TranscodeJob(models.Model):
         self.status = self.STATUS_PROCESSING
         self.save()
         base = os.path.splitext(os.path.basename(self.source.name))[0]
-        
-        jpg = jpeg(self.source.path)
-        self.thumbnail.save(base+'.jpg', File(open(jpg,'rb')))
-        
-        mp4 = h264(self.source.path)
-        self.mp4.save(base+'_h264.mp4', File(open(mp4,'rb')))
-        
-        ogv = theora(self.source.path)
-        self.ogv.save(base+'_theora.ogv', File(open(ogv,'rb')))
-        
-        self.status = self.STATUS_PROCESSED
-        self.transcoded = datetime.datetime.now()
+        try:
+            jpg = jpeg(self.source.path)
+            self.thumbnail.save(base+'.jpg', File(open(jpg,'rb')))
+            
+            mp4 = h264(self.source.path)
+            self.mp4.save(base+'_h264.mp4', File(open(mp4,'rb')))
+            
+            ogv = theora(self.source.path)
+            self.ogv.save(base+'_theora.ogv', File(open(ogv,'rb')))
+            
+            self.status = self.STATUS_PROCESSED
+            self.transcoded = datetime.datetime.now()
+        except TranscodeError:
+            self.STATUS_ERROR
         self.save()
         for file in [jpg,mp4,ogv]:
             os.remove(file)

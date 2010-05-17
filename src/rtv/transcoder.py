@@ -25,7 +25,7 @@ class GenericConverter(object):
         replacements = {'bin': self._bin, 'src': src, 'dst': dst.name}
         commands = [cmd % replacements for cmd in self._cmds]
         for command in commands:
-            process = Popen(command, stdout=PIPE, stderr=STDOUT)
+            process = Popen(command, stdout=PIPE, stderr=STDOUT, shell=True)
             output = process.communicate()[0]
             if process.returncode != 0:
                 raise TranscodeError(output)
