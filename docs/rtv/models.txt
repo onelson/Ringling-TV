@@ -1,0 +1,24 @@
+rtv.models
+=====================================
+
+.. module:: rtv.models
+
+:mod:'models'
+
+===================================
+.. automethod:: upload_dst
+
+.. automodule:: rtv.models
+
+.. autoclass:: TranscodeJob
+
+.. automethod:: transcode
+
+.. autoclass:: TranscodeJobForm
+
+.. autoclass:: Video
+
+.. automethod:: bind_to_fobject
+
+.. autoclass:: VideoForm
+
