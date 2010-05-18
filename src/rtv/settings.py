@@ -26,4 +26,3 @@ def check_bins():
         raise ConfigurationError('Unable to call ffmpeg2theora at [%s]' % 
             RTV_FFMPEG2THEORA)
         
-check_bins()

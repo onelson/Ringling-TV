@@ -3,23 +3,16 @@ rtv.models
 
 .. module:: rtv.models
 
-:mod:`models`
+.. autosummary::
 
-===================================
-
-.. automethod:: upload_dst
-
-.. automodule:: rtv.models
+.. autofunction:: upload_dst
 
 .. autoclass:: TranscodeJob
 
-.. automethod:: transcode
+.. automethod:: TranscodeJob.transcode
 
 .. autoclass:: TranscodeJobForm
 
 .. autoclass:: Video
 
-.. automethod:: bind_to_fobject
-
 .. autoclass:: VideoForm
-
