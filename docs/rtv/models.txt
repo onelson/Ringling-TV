@@ -9,7 +9,7 @@ rtv.models
 
 .. autoclass:: TranscodeJob
 
-.. automethod:: TranscodeJob.transcode
+   .. automethod:: transcode
 
 .. autoclass:: TranscodeJobForm
 
