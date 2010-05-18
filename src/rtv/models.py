@@ -9,7 +9,6 @@ from django.contrib.auth.models import User
 from django.forms import ModelForm
 from django.core.files import File
 import datetime, os
-from uuid import uuid4
 import rtv.fedora
 from rtv.fedora import u, pp, NS
 from rtv.transcoder import theora, h264, jpeg, TranscodeError
@@ -28,6 +27,10 @@ def upload_dst(instance, filename):
     return r'%s' % os.path.join(*path_components)
 
 class TranscodeJob(models.Model):
+    """
+    A transcode job is responsible for taking a 'source' video file and 
+    generating derived formats and resized versions.
+    """
 
     STATUS_PENDING = 1
     STATUS_PROCESSING = 2
@@ -79,44 +82,3 @@ class TranscodeJob(models.Model):
 class TranscodeJobForm(ModelForm):
     class Meta:
         model = TranscodeJob
-
-class Video(models.Model):
-    user = models.ForeignKey(User, editable=False)
-    pid = models.CharField(max_length=255, unique=True)
-    title = models.CharField(max_length=100)
-    
-    source = models.URLField()
-    # derivatives
-    ogv = models.URLField()
-    mp4 = models.URLField()
-    thumbnail = models.URLField()
-
-    created = models.DateTimeField(auto_now_add=True)
-
-    def bind_to_fobject(pid=None):
-        fc = rtv.fedora.get_client()
-        if pid is not None:
-            self.pid = pid
-        else:
-            self.pid = fc.getNextPid(RTV_PID_NAMESPACE)
-            
-        try:
-            obj = fc.getObject(self.pid)
-        except FedoraConnectionException:
-            # if create fails, we need to create
-            obj = fc.createObject(self.pid, label=self.title)
-            obj.addDataStream(u('RELS-EXT'))
-            rels = obj['RELS-EXT']
-            rels[NS.rdfs.hasModel].append(dict(
-                type = u('uri'),
-                value = u('info:fedora/'+pp('EPISODE'))
-            ))
-            rels.checksumType = u('DISABLED')
-            rels.setContent()
-            
-        
-    
-class VideoForm(ModelForm):
-    class Meta:
-        model = Video
-        
