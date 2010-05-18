@@ -1,7 +1,7 @@
 rtv.models
 =====================================
 
-.. module:: rtv.models
+.. automodule:: rtv.models
 
 .. autosummary::
 

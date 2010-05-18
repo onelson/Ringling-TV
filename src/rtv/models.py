@@ -1,3 +1,8 @@
+"""
+A collection of Django Models and related forms used in the fedora ingest 
+process. 
+"""
+
 from django.db import models
 from django.db.models.signals import pre_save, post_init
 from django.contrib.auth.models import User
@@ -11,6 +16,11 @@ from rtv.transcoder import theora, h264, jpeg, TranscodeError
 from rtv.settings import RTV_PID_NAMESPACE
 
 def upload_dst(instance, filename):
+    """
+    This function determines the filesystem location of uploaded media, and the
+    derived (transcoded) media.
+    """
+    
     path_components = [
         'uploads', 'processed', RTV_PID_NAMESPACE]
     path_components += [digit for digit in str(instance.pk)]
