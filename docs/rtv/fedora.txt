@@ -3,7 +3,7 @@ rtv.fedora
 
 .. module:: rtv.fedora
 
-:mod:'fedora'
+:mod:`fedora`
 
 ===================================
 

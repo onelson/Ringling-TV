@@ -3,9 +3,10 @@ rtv.models
 
 .. module:: rtv.models
 
-:mod:'models'
+:mod:`models`
 
 ===================================
+
 .. automethod:: upload_dst
 
 .. automodule:: rtv.models

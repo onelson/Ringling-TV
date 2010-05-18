@@ -3,9 +3,10 @@ rtv.settings
 
 .. module:: rtv.settings
 
-:mod:'settings'
+:mod:`settings`
 
 ===================================
+
 .. autoclass:: ConfigurationError
 
 .. automethod:: check_bins

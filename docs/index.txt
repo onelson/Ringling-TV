@@ -9,9 +9,10 @@ Welcome to rtv's documentation!
 Contents:
 
 .. toctree::
+   :glob:
    :maxdepth: 2
-
-   rtv*
+  
+   rtv/*
 
 Indices and tables
 ==================
