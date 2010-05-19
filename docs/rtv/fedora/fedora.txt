@@ -1,0 +1,27 @@
+rtv.fedora
+=====================================
+
+.. module:: rtv.fedora
+
+:mod:`cmodels`
+===================================
+
+.. automodule:: rtv.fedora.cmodels
+
+.. autofunction:: install_episode
+
+:mod:`objects`
+===================================
+
+.. automodule:: rtv.fedora.objects
+
+.. autoclass:: FedoraObject
+
+.. autoclass:: FedoraDataStream
+
+.. autoclass:: Video
+
+	.. automethod:: _load
+	
+	.. automethod:: _new
+
