@@ -5,8 +5,8 @@ import sys, os, time, logging
 
 from django.conf import settings
 from django.db import connection
-#from rtv.transcoder import jpeg, theora, h264
 from rtv.models import TranscodeJob
+from rtv.transcoder import TranscodeError
 
 LOG_FILE = os.path.join(settings.PROJECT_ROOT,'tmp','transcoded.log')
 logging.basicConfig(filename=LOG_FILE,level=logging.DEBUG)
@@ -24,8 +24,11 @@ class Command(NoArgsCommand):
                 job = TranscodeJob.objects.filter(
                     status=TranscodeJob.STATUS_PENDING)[0]
                 logging.info('starting <TranscodeJob: %d>' % job.pk)
-                job.transcode()
-                logging.info('<TranscodeJob: %d> done.' % job.pk)
+                try:
+                    job.transcode()
+                    logging.info('<TranscodeJob: %d> done.' % job.pk)
+                except TranscodeError, err:
+                    logging.error(err)
             except IndexError:
-                logging.info('waiting...')
+                logging.debug('waiting...')
                 time.sleep(10)

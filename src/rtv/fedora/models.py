@@ -1,4 +1,13 @@
-from rtv import get_client
+"""
+It is vitally important that you understand the models in this module are *NOT*
+conventional django models.  These classes provide a high-level access layer to
+objects stored in your fedora repository.  Where possible, they will emulate 
+django's orm, but that is only the influence for the interface - not the 
+storage.  Tread carefully when using these classes.
+"""
+
+from rtv.settings import RTV_PID_NAMESPACE
+from rtv.fedora import NS, pp, get_client
 
 class FedoraObject(object):
     pid = None

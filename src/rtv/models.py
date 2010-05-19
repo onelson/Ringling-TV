@@ -10,7 +10,7 @@ from django.forms import ModelForm
 from django.core.files import File
 import datetime, os
 import rtv.fedora
-from rtv.fedora import u, pp, NS
+from rtv.fedora import pp, NS
 from rtv.transcoder import theora, h264, jpeg, TranscodeError
 from rtv.settings import RTV_PID_NAMESPACE
 
@@ -73,11 +73,14 @@ class TranscodeJob(models.Model):
             
             self.status = self.STATUS_PROCESSED
             self.transcoded = datetime.datetime.now()
-        except TranscodeError:
+            # cleanup
+            for file in [jpg, mp4, ogv]:
+                os.remove(file)    
+        except TranscodeError, err:
             self.STATUS_ERROR
-        self.save()
-        for file in [jpg,mp4,ogv]:
-            os.remove(file)
+            self.save()
+            raise err
+        
 
 class TranscodeJobForm(ModelForm):
     class Meta:

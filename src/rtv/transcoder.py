@@ -1,4 +1,4 @@
-import sys, os, tempfile
+import os, tempfile
 from subprocess import Popen, PIPE, STDOUT
 
 class TranscodeError(Exception):pass
@@ -16,10 +16,7 @@ class GenericConverter(object):
         
     def __call__(self, file):
         src = os.path.realpath(file)
-        base,ext = os.path.splitext(os.path.basename(src))
-        root = os.path.dirname(src)
-#        dst = os.path.join(root, base+self._suffix+self._ext)
-        dst = tempfile.NamedTemporaryFile(suffix=self._suffix+self._ext, prefix='trans', 
+        dst = tempfile.NamedTemporaryFile(suffix=self._suffix+self._ext, prefix='rtv.trans', 
                                           delete=False)
         dst.close()
         replacements = {'bin': self._bin, 'src': src, 'dst': dst.name}
