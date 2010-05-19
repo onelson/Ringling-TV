@@ -13,6 +13,3 @@ rtv.models
 
 .. autoclass:: TranscodeJobForm
 
-.. autoclass:: Video
-
-.. autoclass:: VideoForm
