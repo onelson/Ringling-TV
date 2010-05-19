@@ -12,6 +12,10 @@
 # serve to show the default.
 
 import sys, os
+DIR = os.path.abspath(os.path.dirname(__file__))
+sys.path += [os.path.abspath(path) for path in [
+    os.path.join(DIR,'..'), os.path.join(DIR, '..','src'), 
+    os.path.join(DIR,'..','eggs')]]
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
