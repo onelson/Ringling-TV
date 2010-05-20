@@ -1,0 +1,13 @@
+rtv.transcoder
+=====================================
+
+.. automodule:: rtv.transcoder
+
+.. autoclass:: GenericConverter
+
+	.. automethod:: GenericConverter.__init__
+	
+	.. automethod:: GenericConverter.__call__
+	
+	
+
