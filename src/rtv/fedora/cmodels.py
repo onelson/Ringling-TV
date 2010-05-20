@@ -58,3 +58,7 @@ def install_episode():
         datastream.versionable = False
     
     return True
+
+def purge_episode():
+    client = get_client()
+    client.deleteObject(pp('EPISODE'), logMessage=u'clearing episode model')

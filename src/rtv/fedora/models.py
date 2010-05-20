@@ -13,7 +13,10 @@ class FedoraObject(object):
     pid = None
     datastreams = None
     @staticmethod
-    def create(*arg, **kwargs):
+    def create(*args, **kwargs):
+        raise NotImplementedError
+    @staticmethod
+    def purge(*args, **kwargs):
         raise NotImplementedError
 
 
@@ -34,6 +37,11 @@ class Video(FedoraObject):
     title = None
     client = None
     fcobj = None
+    
+    @staticmethod
+    def create(*args, **kwargs):pass
+    @staticmethod
+    def purge(*args, **kwargs):pass
     
     def __init__(self, pid=None):
         self._client = get_client()

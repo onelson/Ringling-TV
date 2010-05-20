@@ -10,6 +10,7 @@ from rtv.fedora.cmodels import install_episode
 class Command(NoArgsCommand):
     help = 'add required content models to fedora repo'
     def handle_noargs(self, *args, **kwargs):
-        install_episode()
-        # Done
-        sys.exit(0)
+        try:
+            install_episode()
+        except Exception, err:
+            print >> sys.stderr, err
