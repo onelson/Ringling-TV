@@ -5,7 +5,7 @@ TEMPLATE_DEBUG=DEBUG
 if 'django_nose' not in INSTALLED_APPS: 
     INSTALLED_APPS.append('django_nose')
 
-TEST_RUNNER = 'django_nose.run_tests'
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
 NOSE_ARGS = [
 '--with-xunit', 
