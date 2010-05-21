@@ -27,7 +27,10 @@ class GenericConverter(object):
             if process.returncode != 0:
                 raise TranscodeError(output)
         return dst.name
-
+    def __unicode__(self):
+        return unicode('<GenericConverter: %s>' % (self.pk  or 'undefined')[0])
+    def __str__(self): 
+        return str(self.__unicode__())
 # command strings
 SINGLE_PASS_H264 = [
 '''%(bin)s -y -i "%(src)s" -ab 96k -vcodec libx264 -vpre hq -crf 22 -threads 0 "%(dst)s"''']

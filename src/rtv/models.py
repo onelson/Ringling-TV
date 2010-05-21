@@ -21,7 +21,6 @@ def upload_dst(instance, filename):
     This function determines the filesystem location of uploaded media, and the
     derived (transcoded) media.
     """
-    
     path_components = [
         'uploads', 'processed', RTV_PID_NAMESPACE]
     path_components += [digit for digit in str(instance.pk)]
@@ -33,7 +32,6 @@ class TranscodeJob(models.Model):
     A transcode job is responsible for taking a 'source' video file and 
     generating derived formats and resized versions.
     """
-
     STATUS_PENDING = 1
     STATUS_PROCESSING = 2
     STATUS_PROCESSED = 3
@@ -87,7 +85,15 @@ class TranscodeJob(models.Model):
             self.save()
             raise err
         
+    def __unicode__(self):
+        return unicode('<TranscodeJob: %s>' % (self.pk  or 'undefined')[0])
+    def __str__(self): 
+        return str(self.__unicode__())
 
 class TranscodeJobForm(ModelForm):
+    def __unicode__(self):
+        return unicode('<TranscodeJob>')
+    def __str__(self): 
+        return str(self.__unicode__())
     class Meta:
         model = TranscodeJob

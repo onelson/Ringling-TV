@@ -24,6 +24,9 @@ class FedoraObjectSet(object):
             raise StopIteration
         self.index = self.index + 1
         return self.data[self.index]
+    def __str__(self): 
+        return str(list(self.data))
+
 
 class FedoraDatastream(object):
     _obj = None
@@ -43,6 +46,10 @@ class FedoraDatastream(object):
     
     def set(self, prop, val):
         return setattr(self._obj[self._name], prop, val)
+    def __unicode__(self):
+        return unicode('<FedoraDataStream: %s>' % (self.pk  or 'undefined')[0])
+    def __str__(self): 
+        return str(self.__unicode__())
 
 class FedoraObjectManager(object):
     __cmodel__ = None
@@ -60,6 +67,10 @@ class FedoraObjectManager(object):
     @staticmethod
     def get(**kwargs):
         raise NotImplementedError
+    def __unicode__(self):
+        return unicode('<FedoraObjectManager: %s>' % (self.pk  or 'undefined')[0])
+    def __str__(self): 
+        return str(self.__unicode__())
 
 class FedoraObject(object):
     """
@@ -94,6 +105,10 @@ class FedoraObject(object):
             self.objects.update(**self._props_to_fedora())
     def delete(self):
         self.objects.purge(self.pid)
+    def __unicode__(self):
+        return unicode('<FedoraObject: %s>' % (self.pid  or 'undefined')[0])
+    def __str__(self): 
+        return str(self.__unicode__())
     
 class VideoObjectManager(FedoraObjectManager):
     __cmodel__ = u'info:fedora/'+pp('EPISODE')
@@ -144,6 +159,10 @@ class VideoObjectManager(FedoraObjectManager):
             
     @staticmethod
     def get(**kwargs): pass
+    def __unicode__(self):
+        return unicode('<VideoObjectManager: %s>' % (self.pid  or 'undefined')[0])
+    def __str__(self): 
+        return str(self.__unicode__())
     
 class Video(FedoraObject):
     user = None
@@ -162,4 +181,7 @@ class Video(FedoraObject):
         ))
         rels.checksumType = u'DISABLED'
         rels.setContent()
-        
+    def __unicode__(self):
+        return unicode('<Video: %s>' % (self.pid  or 'undefined')[0])
+    def __str__(self): 
+        return str(self.__unicode__())

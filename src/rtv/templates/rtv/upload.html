@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="upload_for,">
 	<form enctype="multipart/form-data" method="post">
-		{{ form }}
+		{{upload_form}}
 		<input type="submit" value="Submit" />
 		</form>
-</div>
-{% endblock %}
+{% endblock content %}

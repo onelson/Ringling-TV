@@ -4,7 +4,6 @@ from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
-
 import rtv.settings
 from rtv.fedora.models import Video
 from rtv.fedora.cmodels import install_episode
