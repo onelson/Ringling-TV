@@ -4,6 +4,10 @@ from subprocess import Popen, PIPE, STDOUT
 class TranscodeError(Exception):pass
 
 class GenericConverter(object):
+    '''
+    Outputs the converted video file into one of the accepted formats or
+    returns a transcode error if the returncode = 0.
+    '''
     _bin = ''
     _cmd = '%(bin)s %(src)s %(dst)s'
     _ext = ''
