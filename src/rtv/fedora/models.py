@@ -99,7 +99,7 @@ class VideoObjectManager(FedoraObjectManager):
     __cmodel__ = u'info:fedora/'+pp('EPISODE')
     __datastreams__ = ['DC', 'RELS-EXT', 'MP4', 'OGV', 'THUMBNAIL']
     @staticmethod
-    def create(user, source, mp4, ogv, thumbnail, dc={}):
+    def create(user, raw, mp4, ogv, thumbnail, dc={}):
         fc = get_client()
         pid = fc.getNextPID(RTV_PID_NAMESPACE)
         
@@ -119,7 +119,7 @@ class VideoObjectManager(FedoraObjectManager):
                 dcore[k] = unicode(v)
             dcore.setContent()
         dstreams = (
-            ('RAW', source, u'application/octet-stream'),
+            ('RAW', raw, u'application/octet-stream'),
             ('MP4', mp4, u'video/mp4'),
             ('OGV', ogv, u'video/ogv'),
             ('THUMBNAIL', thumbnail, u'image/jpeg')

@@ -29,7 +29,7 @@ class TranscodeJobTest(TestCase):
         self.created_vid = {'size':os.path.getsize(vfh.name)}
         vid = TranscodeJob.objects.create(user=self.user, title='test video')
         ext = os.path.splitext(vfh.name)[0] 
-        vid.source.save('tmp'+ext,vfh, save=True)
+        vid.raw.save('tmp'+ext,vfh, save=True)
         return vid
     
     def setUp(self):
@@ -43,7 +43,7 @@ class TranscodeJobTest(TestCase):
         self.vid.delete()
         
     def testCreate(self):
-        self.assertTrue(os.path.exists(self.vid.source.path))
+        self.assertTrue(os.path.exists(self.vid.raw.path))
     def testGet(self):
         TranscodeJob.objects.get(pk=self.vid.pk)
 
@@ -62,6 +62,6 @@ class TranscodeJobTest(TestCase):
         self.assertTrue(os.path.exists(self.vid.mp4.path))
         self.assertTrue(os.path.exists(self.vid.thumbnail.path))
         tj = self.vid
-        Video.objects.create(user=tj.user.username, source=tj.source.url, 
+        Video.objects.create(user=tj.user.username, raw=tj.raw.url, 
                     mp4=tj.mp4.url, ogv=tj.ogv.url, thumbnail=tj.thumbnail.url, 
                     dc=dict(title=tj.title))

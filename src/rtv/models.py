@@ -4,13 +4,10 @@ process.
 """
 
 from django.db import models
-from django.db.models.signals import pre_save, post_init
 from django.contrib.auth.models import User
 from django.forms import ModelForm
 from django.core.files import File
 import datetime, os
-import rtv.fedora
-from rtv.fedora import pp, NS
 from rtv.transcoder import theora, h264, jpeg, TranscodeError
 from rtv.settings import RTV_PID_NAMESPACE
 
@@ -48,7 +45,7 @@ class TranscodeJob(models.Model):
     title = models.CharField(max_length=100, editable=True)
     status = models.SmallIntegerField(choices=STATUS_CHOICES, 
                                       default=STATUS_PENDING, editable=False)
-    source = models.FileField(upload_to=upload_dst, null=True)
+    raw = models.FileField(upload_to=upload_dst, null=True)
     
     ogv = models.FileField(upload_to=upload_dst, null=True, editable=False)
     mp4 = models.FileField(upload_to=upload_dst, null=True, editable=False)
@@ -60,15 +57,15 @@ class TranscodeJob(models.Model):
     def transcode(self):
         self.status = self.STATUS_PROCESSING
         self.save()
-        base = os.path.splitext(os.path.basename(self.source.name))[0]
+        base = os.path.splitext(os.path.basename(self.raw.name))[0]
         try:
-            jpg = jpeg(self.source.path)
+            jpg = jpeg(self.raw.path)
             self.thumbnail.save(base+'.jpg', File(open(jpg,'rb')))
             
-            mp4 = h264(self.source.path)
+            mp4 = h264(self.raw.path)
             self.mp4.save(base+'_h264.mp4', File(open(mp4,'rb')))
             
-            ogv = theora(self.source.path)
+            ogv = theora(self.raw.path)
             self.ogv.save(base+'_theora.ogv', File(open(ogv,'rb')))
             
             self.status = self.STATUS_PROCESSED
