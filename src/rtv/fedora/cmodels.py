@@ -23,8 +23,8 @@ def install_episode():
       <dsTypeModel ID="RAW">
         <form MIME="application/octet-stream"></form>
       </dsTypeModel>
-      <dsTypeModel ID="FLV">
-        <form MIME="video/x-flv"></form>
+      <dsTypeModel ID="MP4">
+        <form MIME="video/mp4"></form>
       </dsTypeModel>
       <dsTypeModel ID="OGV">
         <form MIME="video/ogg"></form>

@@ -22,9 +22,6 @@ class FedoraTest(TestCase):
         
     def testCanTalkToFedoraServer(self):
         get_client()
-        
-    def testCanCreateVideo(self):
-        pass
 
     def testInstallPurgeEpisodeContentModel(self):
         # episode is installed in setup, so it should fail to add it again

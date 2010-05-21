@@ -8,49 +8,141 @@ storage.  Tread carefully when using these classes.
 
 from rtv.settings import RTV_PID_NAMESPACE
 from rtv.fedora import NS, pp, get_client
+from fcrepo.connection import FedoraConnectionException
+
+class FedoraObjectSet(object):
+    """
+    Iterator for looping over a sequence of FedoraObjects
+    """
+    def __init__(self, data):
+        self.data = data
+        self.index = 0
+    def __iter__(self):
+        return self
+    def next(self):
+        if self.index == len(self.data):
+            raise StopIteration
+        self.index = self.index + 1
+        return self.data[self.index]
+
+class FedoraDatastream(object):
+    _obj = None
+    _controlGroup = None
+    _versionable = None
+    _name = None
+    def __init__(self, instance, name, controlGroup, versionable):
+        self._obj = instance # reference to the parent object
+        self._name = unicode(name)
+        self._controlGroup = unicode(controlGroup)
+        self._versionable = bool(versionable)
+    def get(self, prop):
+        """
+        Return the value of datastream.prop
+        """
+        return getattr(self._obj[self._name], prop)
+    
+    def set(self, prop, val):
+        return setattr(self._obj[self._name], prop, val)
+
+class FedoraObjectManager(object):
+    __cmodel__ = None
+    
+    @staticmethod
+    def create(**kwargs):
+        raise NotImplementedError
+    @staticmethod
+    def update(**kwargs):
+        raise NotImplementedError
+    @staticmethod
+    def purge(pid):
+        client = get_client()
+        client.deleteObject(pid)
+    @staticmethod
+    def get(**kwargs):
+        raise NotImplementedError
 
 class FedoraObject(object):
+    """
+    An abstract base class for fedora objects.
+    """
     pid = None
-    datastreams = None
-    @staticmethod
-    def create(*args, **kwargs):
-        raise NotImplementedError
-    @staticmethod
-    def purge(*args, **kwargs):
-        raise NotImplementedError
-
-
-class FedoraDataStream(object):
-    def __init__(self):
-        pass
-    def __get__(self, instance, owner): 
-        raise NotImplementedError
-    def __set__(self, instance, value): 
-        raise NotImplementedError
-    def __del__(self, instance): 
+    objects = FedoraObjectManager()
+    __datastreams__ = []
+    
+    def _datastream(self, name):
+        def _get(name):
+            return self.pid
+        return property()
+    
+    def _props_to_fedora(self):
         raise NotImplementedError
     
-
+    def __init__(self, **kwargs):
+        if kwargs:
+            self._load(**kwargs)
+    
+    def save(self):
+        client = get_client()
+        try:
+            client.getObject(self.pid)
+            is_new = False
+        except FedoraConnectionException:
+            is_new = True
+        if is_new:
+            self.objects.create(**self._props_to_fedora())
+        else:
+            self.objects.update(**self._props_to_fedora())
+    def delete(self):
+        self.objects.purge(self.pid)
+    
+class VideoObjectManager(FedoraObjectManager):
+    __cmodel__ = u'info:fedora/'+pp('EPISODE')
+    __datastreams__ = ['DC', 'RELS-EXT', 'MP4', 'OGV', 'THUMBNAIL']
+    @staticmethod
+    def create(user, source, mp4, ogv, thumbnail, dc={}):
+        fc = get_client()
+        pid = fc.getNextPID(RTV_PID_NAMESPACE)
+        
+        obj = fc.createObject(pid, label=unicode(dc['title']))
+        obj.addDataStream(u'RELS-EXT')
+        rels = obj['RELS-EXT']
+        rels[NS.rdfs.hasModel].append(dict(
+            type = u'uri',
+            value = VideoObjectManager.__cmodel__
+        ))
+        rels.checksumType = u'DISABLED'
+        rels.setContent()
+        if dc:
+            dcore = obj['DC']
+            dcore.versionable = False
+            for k, v in dc.iteritems():
+                dcore[k] = unicode(v)
+            dcore.setContent()
+        dstreams = (
+            ('RAW', source, u'application/octet-stream'),
+            ('MP4', mp4, u'video/mp4'),
+            ('OGV', ogv, u'video/ogv'),
+            ('THUMBNAIL', thumbnail, u'image/jpeg')
+        )
+        for (dsname, url, mime)in dstreams:
+            obj.addDataStream(dsname, controlGroup=u'R',
+                                            label = u'media ds', 
+                                            logMessage = u'adding ds',
+                                            location = unicode('http://localhost:8000'+url),
+                                            mimeType = mime,
+                                            checksumType= u'DISABLED',
+                                            versionable = False)
+        
+        return VideoObjectManager.get(pid=pid)
+            
+    @staticmethod
+    def get(**kwargs): pass
+    
 class Video(FedoraObject):
     user = None
     pid = None
     title = None
-    client = None
-    fcobj = None
-    
-    @staticmethod
-    def create(*args, **kwargs):pass
-    @staticmethod
-    def purge(*args, **kwargs):pass
-    
-    def __init__(self, pid=None):
-        self._client = get_client()
-        self.pid = pid
-        if self.pid:
-            self.fcobj = self._client.getObject(self.pid)
-    
-    def _load(self):
-        self.fcobj = self._client.getObject(self.pid)
+    objects = VideoObjectManager()
 
     def _new(self):
         self.pid = self._client.getNextPid(RTV_PID_NAMESPACE)
@@ -63,3 +155,4 @@ class Video(FedoraObject):
         ))
         rels.checksumType = u'DISABLED'
         rels.setContent()
+        

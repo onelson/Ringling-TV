@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from rtv.models import TranscodeJob
 import os
 
+from rtv.fedora.models import Video
+
 class TranscodeJobTest(TestCase):
     fixtures = ['test_users']
     
@@ -21,31 +23,31 @@ class TranscodeJobTest(TestCase):
         self.created_vid = {'size':os.path.getsize(vfh.name)}
         vid = TranscodeJob.objects.create(user=self.user, title='test video')
         vid.source.save('tmp',vfh, save=True)
-        self.tmpfile = vid_file
-        self.created_vid['pk'] = vid.pk
-        self.created_vid['path'] = vid.source.path
+        return vid
     
     def setUp(self):
         self.user = User.objects.get(username='meg')
-        self.createFakeVid()
+        self.vid = self.createFakeVid()
+    
+    def tearDown(self):
+        self.vid.delete()
         
-    def tearDown(self):pass
+    def testCreate(self):
+        self.assertTrue(os.path.exists(self.vid.source.path))
+    def testGet(self):
+        TranscodeJob.objects.get(pk=self.vid.pk)
 
-    def testCanCreate(self):
-        self.assertTrue(os.path.exists(self.created_vid['path']))
-    def testCanGet(self):
-        obj = TranscodeJob.objects.get(pk=self.created_vid['pk'])
-        self.assertEqual(os.path.getsize(obj.source.path), self.created_vid['size'])
-    
-    def testCanTranscode(self):
-        obj = TranscodeJob.objects.get(pk=self.created_vid['pk'])
-        obj.transcode()
-        self.assertEqual(obj.status, obj.STATUS_PROCESSED)
-        self.assertTrue(os.path.exists(obj.ogv.path))
-        self.assertTrue(os.path.exists(obj.mp4.path))
-        self.assertTrue(os.path.exists(obj.thumbnail.path))
-    
-    def testCanDelete(self):
-        obj = TranscodeJob.objects.get(pk=self.created_vid['pk'])
-        obj.delete()
-        self.assertFalse(os.path.exists(self.created_vid['path']))
+    def testTranscodeAndCreateVideo(self):
+        """
+        I hoped to have this test in the fedora test suite, but it would involve
+        reruning the transcode tests...
+        """
+        self.vid.transcode()
+        self.assertEqual(self.vid.status, self.vid.STATUS_PROCESSED)
+        self.assertTrue(os.path.exists(self.vid.ogv.path))
+        self.assertTrue(os.path.exists(self.vid.mp4.path))
+        self.assertTrue(os.path.exists(self.vid.thumbnail.path))
+        tj = self.vid
+        Video.objects.create(user=tj.user.username, source=tj.source.url, 
+                    mp4=tj.mp4.url, ogv=tj.ogv.url, thumbnail=tj.thumbnail.url, 
+                    dc=dict(title=tj.title))
