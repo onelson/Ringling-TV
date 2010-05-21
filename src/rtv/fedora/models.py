@@ -128,10 +128,17 @@ class VideoObjectManager(FedoraObjectManager):
             obj.addDataStream(dsname, controlGroup=u'R',
                                             label = u'media ds', 
                                             logMessage = u'adding ds',
-                                            location = unicode('http://localhost:8000'+url),
+                                            location = unicode(url),
                                             mimeType = mime,
                                             checksumType= u'DISABLED',
                                             versionable = False)
+            
+#            These 2 lines basically commit the change to the fedora object, 
+#            which helps us avoid getting object locked errors when adding 
+#            numerous datastreams to an object in a short period of time.
+            
+            ds = obj[dsname]
+            ds.setContent()
         
         return VideoObjectManager.get(pid=pid)
             
