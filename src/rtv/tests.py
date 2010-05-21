@@ -6,6 +6,7 @@ from rtv.models import TranscodeJob
 import os
 
 from rtv.fedora.models import Video
+from rtv.fedora.cmodels import install_episode
 
 class TranscodeJobTest(TestCase):
     fixtures = ['test_users']
@@ -22,12 +23,16 @@ class TranscodeJobTest(TestCase):
         vfh = File(open(vid_file,'rb'))
         self.created_vid = {'size':os.path.getsize(vfh.name)}
         vid = TranscodeJob.objects.create(user=self.user, title='test video')
-        vid.source.save('tmp',vfh, save=True)
+        ext = os.path.splitext(vfh.name)[0] 
+        vid.source.save('tmp'+ext,vfh, save=True)
         return vid
     
     def setUp(self):
         self.user = User.objects.get(username='meg')
         self.vid = self.createFakeVid()
+        try: 
+            install_episode()
+        except: pass
     
     def tearDown(self):
         self.vid.delete()
@@ -39,8 +44,12 @@ class TranscodeJobTest(TestCase):
 
     def testTranscodeAndCreateVideo(self):
         """
-        I hoped to have this test in the fedora test suite, but it would involve
-        reruning the transcode tests...
+        Calls TranscodeJob.transcode() then verifies the derived files exist.
+        Takes TranscodeJob data, and passes it to Video.objects.create() to add
+        the urls to the fedora repository.
+        
+        I've lumped a few assertions together here since this test involves the
+        most labor.
         """
         self.vid.transcode()
         self.assertEqual(self.vid.status, self.vid.STATUS_PROCESSED)
