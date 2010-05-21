@@ -1,17 +1,34 @@
+import os, uuid
 from django.test import TestCase
 from django.conf import settings
 from django.core.files import File
+from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
-from rtv.models import TranscodeJob
-import os
 
 import rtv.settings
 from rtv.fedora.models import Video
 from rtv.fedora.cmodels import install_episode
+from rtv.models import TranscodeJob
+from rtv.storage import PermenantStorage
 
 class SettingsTest(TestCase):
     def testBinariesAreAvailabe(self):
         rtv.settings.check_bins()
+
+class StorageTest(TestCase):
+    def setUp(self): 
+        self.tempfile = str(uuid.uuid4())
+    def tearDown(self):
+        if os.path.exists(self.tempfile):
+            os.remove(self.tempfile)
+    def testPermenantStorageIsPermenant(self):
+        storage = PermenantStorage()
+        path = storage.save(self.tempfile, ContentFile('new content'))
+        self.assertEquals(path, self.tempfile)
+        self.assertEquals(11, storage.size(path))
+        self.assertEquals('new content', storage.open(path).read())
+        storage.delete(path)
+        self.assertTrue(storage.exists(path))
 
 class TranscodeJobTest(TestCase):
     fixtures = ['test_users']

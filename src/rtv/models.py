@@ -11,6 +11,11 @@ import datetime, os
 from rtv.transcoder import theora, h264, jpeg, TranscodeError
 from rtv.settings import RTV_PID_NAMESPACE
 
+from rtv.storage import PermenantStorage
+
+perm_storage = PermenantStorage()
+
+
 def upload_dst(instance, filename):
     """
     This function determines the filesystem location of uploaded media, and the
@@ -45,11 +50,15 @@ class TranscodeJob(models.Model):
     title = models.CharField(max_length=100, editable=True)
     status = models.SmallIntegerField(choices=STATUS_CHOICES, 
                                       default=STATUS_PENDING, editable=False)
-    raw = models.FileField(upload_to=upload_dst, null=True)
+    raw = models.FileField(upload_to=upload_dst, null=True, 
+                           storage=perm_storage)
     
-    ogv = models.FileField(upload_to=upload_dst, null=True, editable=False)
-    mp4 = models.FileField(upload_to=upload_dst, null=True, editable=False)
-    thumbnail = models.FileField(upload_to=upload_dst, null=True, editable=False)
+    ogv = models.FileField(upload_to=upload_dst, null=True, editable=False, 
+                           storage=perm_storage)
+    mp4 = models.FileField(upload_to=upload_dst, null=True, editable=False, 
+                           storage=perm_storage)
+    thumbnail = models.FileField(upload_to=upload_dst, null=True, 
+                                 editable=False, storage=perm_storage)
     
     created = models.DateTimeField(auto_now_add=True)
     transcoded = models.DateTimeField(null=True, editable=False)
