@@ -18,7 +18,7 @@ from subprocess import check_call
 def check_bins():
     """
     Runs check_call on required binaries for the system.
-    Configure settings.RTV_FFMPEG and settings.RTV.FFMPEG2THEORA to control 
+    Configure settings.RTV_FFMPEG and settings.RTV_FFMPEG2THEORA to control 
     their locations.
     """
     try:

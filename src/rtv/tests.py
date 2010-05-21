@@ -5,8 +5,13 @@ from django.contrib.auth.models import User
 from rtv.models import TranscodeJob
 import os
 
+import rtv.settings
 from rtv.fedora.models import Video
 from rtv.fedora.cmodels import install_episode
+
+class SettingsTest(TestCase):
+    def testBinariesAreAvailabe(self):
+        rtv.settings.check_bins()
 
 class TranscodeJobTest(TestCase):
     fixtures = ['test_users']
