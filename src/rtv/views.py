@@ -8,7 +8,8 @@ from django.contrib.auth.models import User
 def demo(request):
     objects = TranscodeJob.objects.filter(
                 status=TranscodeJob.STATUS_PROCESSED)
-    if objects.count(): vids = list(objects)[-1]
+    if objects.count() > 0: 
+        vids = list(objects)[-1]
     else: vids = None
     return render_to_response('rtv/demo.html',
         {'rtv_version': rtv.get_version(),'title': "This is the rtv demo page", 
