@@ -37,9 +37,11 @@ class Command(BaseCommand):
         print >> sys.stdout, self.help
         
     def _start(self):
+        print >> sys.stdout, 'Starting up...'
         if is_alive():
             raise AlreadyRunningError('Daemon is already running. Try to "stop"'
-                                      'or "restart"')
+                                      ' or "restart"')
+        print >> sys.stdout, 'Done.'
         daemonize()
         write_pid()
         LOG.info('== init ==')
@@ -63,6 +65,7 @@ class Command(BaseCommand):
             LOG.critical(err)
 
     def _stop(self):
+        print >> sys.stdout, 'Shutting down...'
         try:
             if is_alive():
                 os.kill(read_pid(), 15)
@@ -70,11 +73,14 @@ class Command(BaseCommand):
                 print >> sys.stderr, 'Can\'t kill process - already stopped?'
         except MissingPidError, err:
             print >> sys.stderr, err
-            print >> sys.stdout, 'Trying to clean up stale PID file.'
+            print >> sys.stdout, 'Trying to clean up stale PID file...'
             os.remove(PID_FILE)
+        print >> sys.stdout, 'Done.'
             
     def _restart(self): 
+        
         self._stop()
+        time.sleep(5)
         self._start()
     
     def handle(self, *args, **opts):
