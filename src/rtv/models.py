@@ -10,9 +10,9 @@ from django.core.files import File
 import datetime, os
 from rtv.transcoder import theora, h264, jpeg, TranscodeError
 from rtv.settings import RTV_PID_NAMESPACE
-
+from subprocess import Popen, PIPE, STDOUT
+from rtv import settings
 from rtv.storage import PermenantStorage
-
 perm_storage = PermenantStorage()
 
 
@@ -61,6 +61,8 @@ class TranscodeJob(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     transcoded = models.DateTimeField(null=True, editable=False)
     
+    source_media = models.TextField(TranscodeJob.transcode.line, editable=False)
+    
     def transcode(self):
         self.status = self.STATUS_PROCESSING
         self.save()
@@ -75,6 +77,12 @@ class TranscodeJob(models.Model):
             ogv = theora(self.raw.path)
             self.ogv.save(base+'_theora.ogv', File(open(ogv,'rb')))
             
+            proc = Popen('%s' % settings.RTV_FFMPEG2THEORA, stdout=PIPE)
+            (stdout,stderr) = proc.communicate()
+            print stderr
+            for line in stdout.splitlines():
+                print line
+                
             self.status = self.STATUS_PROCESSED
             self.transcoded = datetime.datetime.now()
             # cleanup
@@ -84,7 +92,6 @@ class TranscodeJob(models.Model):
             self.STATUS_ERROR
             self.save()
             raise err
-        
     def __unicode__(self):
         return unicode('<TranscodeJob: %s>' % (self.pk  or 'undefined')[0])
     def __str__(self): 
