@@ -29,6 +29,22 @@ class StorageTest(TestCase):
         storage.delete(path)
         self.assertTrue(storage.exists(path))
 
+class ViewsTest(TestCase):
+    def testDemo(self):
+        response = self.client.get('/rtv/demo/')
+        self.failUnlessEqual(response.status_code, 200)
+
+    def testInfo(self):
+        response = self.client.get('/rtv/info/')
+        self.failUnlessEqual(response.status_code, 200)
+
+    def testUpload(self):
+        response = self.client.get('/rtv/upload/')
+        self.failUnlessEqual(response.status_code, 200)
+        # this test needs to also check the ability to upload and therefore test
+        # the redirect on to rtv.views.success
+
+
 class TranscodeJobTest(TestCase):
     fixtures = ['test_users']
     
@@ -81,3 +97,4 @@ class TranscodeJobTest(TestCase):
         Video.objects.create(user=tj.user.username, raw=tj.raw.url, 
                     mp4=tj.mp4.url, ogv=tj.ogv.url, thumbnail=tj.thumbnail.url, 
                     dc=dict(title=tj.title))
+
