@@ -2,15 +2,16 @@ from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
 import sys, os, time, logging
 
-import django.db.connection
-refresh_db_connection = getattr(django.db.connection, 'close')
+from django.db import connection
+refresh_db_connection = getattr(connection, 'close')
 
 from django.conf import settings
 from rtv.models import TranscodeJob
 from rtv.transcoder import TranscodeError
 
 LOG_FILE = os.path.join(settings.PROJECT_ROOT,'tmp','transcoded.log')
-logging.basicConfig(filename=LOG_FILE,level=logging.DEBUG)
+PID_FILE = os.path.join(settings.PROJECT_ROOT,'tmp','transcoded.pid')
+logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG)
 
 LOG = logging.getLogger('Transcode.d')
 LOG.addHandler(logging.StreamHandler())
@@ -30,31 +31,51 @@ ACTIONS = {
 ACTION_DEFAULT = ACTION_HELP
 class Command(BaseCommand):
     action = ACTION_DEFAULT
+    help = 'action required: start | stop | restart'
     
-    def _help(self): pass
+    def _help(self): 
+        print >> sys.stdout, self.help
+        
     def _start(self):
-        """
-        TODO: This guy will be getting ported to the daemon style (see the huge 
-        comment below this class).
-        """ 
+        if is_alive():
+            raise AlreadyRunningError('Daemon is already running. Try to "stop"'
+                                      'or "restart"')
+        daemonize()
+        write_pid()
         LOG.info('== init ==')
-        while True:
-            refresh_db_connection()
-            try:
-                job = TranscodeJob.objects.filter(
-                    status=TranscodeJob.STATUS_PENDING)[0]
-                logging.info('starting <TranscodeJob: %d>' % job.pk)
+        LOG.info('Daemon started: [%d]' % read_pid())
+        try:
+            while True:
+                refresh_db_connection()
                 try:
-                    job.transcode()
-                    logging.info('<TranscodeJob: %d> done.' % job.pk)
-                except TranscodeError, err:
-                    logging.error(err)
-            except IndexError:
-                logging.debug('waiting...')
-                time.sleep(10)
+                    job = TranscodeJob.objects.filter(
+                        status=TranscodeJob.STATUS_PENDING)[0]
+                    LOG.info('starting <TranscodeJob: %d>' % job.pk)
+                    try:
+                        job.transcode()
+                        LOG.info('<TranscodeJob: %d> done.' % job.pk)
+                    except TranscodeError, err:
+                        LOG.error(err)
+                except IndexError:
+                    LOG.debug('waiting...')
+                    time.sleep(10)
+        except Exception, err:
+            LOG.critical(err)
 
-    def _stop(self): pass
-    def _restart(self): pass
+    def _stop(self):
+        try:
+            if is_alive():
+                os.kill(read_pid(), 15)
+            else:
+                print >> sys.stderr, 'Can\'t kill process - already stopped?'
+        except MissingPidError, err:
+            print >> sys.stderr, err
+            print >> sys.stdout, 'Trying to clean up stale PID file.'
+            os.remove(PID_FILE)
+            
+    def _restart(self): 
+        self._stop()
+        self._start()
     
     def handle(self, *args, **opts):
         try:
@@ -77,6 +98,55 @@ class Command(BaseCommand):
         
         return run() # once we know how to delegate, just run it!
 
+def daemonize():
+    """
+    Detach from the terminal and continue as a daemon.
+    """
+    # swiped from twisted/scripts/twistd.py
+    # See http://www.erlenstar.demon.co.uk/unix/faq_toc.html#TOC16
+    if os.fork():   # launch child and...
+        os._exit(0) # kill off parent
+    os.setsid()
+    if os.fork():   # launch child and...
+        os._exit(0) # kill off parent again.
+    os.umask(022)
+    null = os.open("/dev/null", os.O_RDWR)
+    for i in range(3):
+        try:
+            os.dup2(null, i)
+        except OSError, e:
+            if e.errno != errno.EBADF:
+                raise
+    os.close(null)
+
+# Exceptions
+class AlreadyRunningError(Exception): pass
+class MissingPidError(Exception): pass
+
+# Pid helpers
+def read_pid():
+    try:
+        pf = open(PID_FILE)
+        pid = pf.read().rstrip()
+    except IOError:
+        print >> sys.stderr, 'PID file does not exist!'
+        pid = None 
+    try:
+        return int(pid)
+    except TypeError:
+        raise MissingPidError('Unable to read PID.')
+        
+def write_pid():
+    pf = open(PID_FILE,'w+b')
+    pf.write(str(os.getpid()))
+    pf.close()
+
+def is_alive():
+    try:
+        os.kill(read_pid(),0)
+        return True
+    except: 
+        return False
 
 # This code was all stolen from another project I did.  The daemon was never 
 # completed - it could start, and record its pid, but stop and restart were 
