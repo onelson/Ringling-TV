@@ -1,11 +1,9 @@
 import os
 import rtv
-from rtv.models import TranscodeJob, Video, TranscodeJobForm
+from rtv.models import TranscodeJob, TranscodeJobForm
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.contrib.auth.models import User
-from django.core.files import File
-
             
 def demo(request):
     return render_to_response('rtv/demo.html',
@@ -15,7 +13,6 @@ def demo(request):
         RequestContext(request))
 
 def upload(request):
-    user = list(User.objects.all())[0]
     form = TranscodeJobForm()
     if request.method == 'POST':
         form = TranscodeJobForm(request.POST, request.FILES)
@@ -39,7 +36,7 @@ def success(request):
         RequestContext(request))
 
 def info(request):
-    context = {'jobs': TranscodeJob.objects.all(), 'vids': Video.objects.all(),
+    context = {'jobs': TranscodeJob.objects.all(), 'vids': TranscodeJob.objects.all(),
                'rtv_version': rtv.get_version(),
                'title': 'This is the rtv info page' }
     return render_to_response('rtv/info.html',
