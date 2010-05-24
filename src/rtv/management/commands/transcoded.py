@@ -13,9 +13,9 @@ LOG_FILE = os.path.join(settings.PROJECT_ROOT,'tmp','transcoded.log')
 PID_FILE = os.path.join(settings.PROJECT_ROOT,'tmp','transcoded.pid')
 
 if getattr(settings, 'DEBUG', False):
-    level = logging.INFO
-else:
     level = logging.DEBUG
+else:
+    level = logging.INFO
 logging.basicConfig(filename=LOG_FILE, level=level)
 
 LOG = logging.getLogger('Transcode.d')
