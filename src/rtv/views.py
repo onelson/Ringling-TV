@@ -8,8 +8,8 @@ from django.contrib.auth.models import User
 def demo(request):
     return render_to_response('rtv/demo.html',
         {'rtv_version': rtv.get_version(),'title': "This is the rtv demo page", 
-            'vids': [list(TranscodeJob.objects.filter(
-                status=TranscodeJob.STATUS_PROCESSED))[-1]]}, 
+            'vids': [(list(TranscodeJob.objects.filter(
+                status=TranscodeJob.STATUS_PROCESSED))[-1] or None)[0]]}, 
         RequestContext(request))
 
 def upload(request):
