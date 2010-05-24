@@ -35,6 +35,8 @@ class GenericConverter(object):
 # command strings
 SINGLE_PASS_H264 = [
 '''%(bin)s -y -i "%(src)s" -ab 96k -vcodec libx264 -vpre hq -crf 22 -threads 0 "%(dst)s"''']
+
+# had issues doing the two pass - could just be some bad params...
 DOUBLE_PASS_H264 = [
 '''%(bin)s -i "%(src)s" -an -pass 1 -vcodec libx264 -vpre slow_firstpass -b 15 -bt 15 -threads 0 "%(dst)s"''',
 '''%(bin)s -i "%(src)s" -ab 128k -pass 2 -vcodec libx264 -vpre slow -b 15 -bt 15 -threads 0 "%(dst)s"''']
@@ -65,5 +67,6 @@ FORMATS = {
 
 theora = GenericConverter(**FORMATS['ogv'])
 h264 = GenericConverter(**FORMATS['mp4'])
+# 2 pass is unused until we can get it to work consistently
 #h264_2pass = GenericConverter(**FORMATS['mp4-2pass'])
 jpeg = GenericConverter(**FORMATS['jpg'])
