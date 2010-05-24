@@ -31,10 +31,7 @@ class GenericConverter(object):
             if process.returncode != 0:
                 raise TranscodeError(output)
         return dst.name
-    def __unicode__(self):
-        return unicode('<GenericConverter: %s>' % (self.pk  or 'undefined')[0])
-    def __str__(self): 
-        return str(self.__unicode__())
+    
 # command strings
 SINGLE_PASS_H264 = [
 '''%(bin)s -y -i "%(src)s" -ab 96k -vcodec libx264 -vpre hq -crf 22 -threads 0 "%(dst)s"''']
@@ -45,10 +42,6 @@ DOUBLE_PASS_H264 = [
 from rtv.settings import RTV_FFMPEG, RTV_FFMPEG2THEORA
 
 FORMATS = {
-'flv': {
-    'ext': '.flv', 
-    'bin': RTV_FFMPEG, 
-    'cmds': ['''%(bin)s -y -i "%(src)s -ab 96k -vcodec libx264 -vpre slow -crf 22 -threads 0 "%(dst)s"''']},
 'ogv': {
     'ext': '.ogv', 
     'bin': RTV_FFMPEG2THEORA, 
@@ -70,7 +63,6 @@ FORMATS = {
     'cmds': ['''%(bin)s -y -i "%(src)s" -vcodec mjpeg -vframes 1 -an -f rawvideo "%(dst)s"''']},
 }
 
-#flash = GenericConverter(**FORMATS['flv'])
 theora = GenericConverter(**FORMATS['ogv'])
 h264 = GenericConverter(**FORMATS['mp4'])
 #h264_2pass = GenericConverter(**FORMATS['mp4-2pass'])
