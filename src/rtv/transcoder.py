@@ -5,8 +5,35 @@ class TranscodeError(Exception):pass
 
 class GenericConverter(object):
     '''
-    Outputs the converted video file into one of the accepted formats or
-    returns a transcode error if the returncode = 0.
+    To build a new command to be passed as a callable object
+    to the GenericConverter class, start the command with the
+    binary to be used, followed by whichever flags you wish to use.
+        %(bin)s
+    Next, use the location of file.
+        "%(src)s"
+    Any encoding settings from ffmpeg and ffmpeg2theora go here.
+        ex: bitrate, -pass #, -threads #, etc.
+    %(dst)s is the created temporary video file based on these 
+    settings. 
+    
+    Name these as a conversion process by creating them in this format:
+        NAME_OF_CONVERSION_PROCESS = [
+            %(bin)s -flags "%(src)s" -encoding -settings "%(dst)s"]
+    This can also be made into a list.
+        NAME_OF_CONVERSION_PROCESS = [
+            """%(bin)s -flags "%(src)s" -encoding -settings "%(dst)s"""",
+            """%(bin)s -flags "%(src)s" -encoding -settings "%(dst)s""""]
+            
+    This configuration can be passed to the class in this format:
+        NAME_OF_CONVERSION_PROCESS = GenericConverter(**settings)
+            
+    To configure settings for the extension, suffix, etc., change 
+    what you wish them to be here.
+        'my_settings': {
+            'ext': '.mp4', 
+            'bin': RTV_FFMPEG, 
+            'cmds': SINGLE_PASS_H264,
+            'suffix': '_h264'}
     '''
     _bin = ''
     _cmd = '%(bin)s %(src)s %(dst)s'
@@ -31,7 +58,7 @@ class GenericConverter(object):
             if process.returncode != 0:
                 raise TranscodeError(output)
         return dst.name
-    
+
 # command strings
 SINGLE_PASS_H264 = [
 '''%(bin)s -y -i "%(src)s" -ab 96k -vcodec libx264 -vpre hq -crf 22 -threads 0 "%(dst)s"''']
