@@ -37,7 +37,7 @@ class ViewsTest(TestCase):
         self.failUnlessEqual(response.status_code, 200)
 
     def testInfo(self):
-        response = self.client.get('/rtv/info/')
+        response = self.client.get('/rtv/publish-queue/')
         self.failUnlessEqual(response.status_code, 200)
 
     def testUpload(self):
