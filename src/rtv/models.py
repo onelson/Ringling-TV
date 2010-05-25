@@ -97,7 +97,7 @@ class TranscodeJob(models.Model):
 
     def set_info(self):
         cmd = '''%s --info "%s"''' % (settings.RTV_FFMPEG2THEORA, self.raw.path)
-        self.info = Popen(cmd, stdout=PIPE).communicate()[0]
+        self.info = Popen(cmd, stdout=PIPE, shell=True).communicate()[0]
         self.save()
         
     def get_info(self):
