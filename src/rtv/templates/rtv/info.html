@@ -4,16 +4,27 @@
 {% for job in jobs %}
 {% if forloop.first %}
 	<tr>
+		<td></td>
 		<td>title</td>
 		<td>status</td>
 		<td>created</td>
 	</tr>
 {% endif %}
 <tr>
+	<td>{% if job.status == job.STATUS_PROCESSED %}
+		<img src="{{job.thumbnail.url}}" style="width:128px;height:auto;" />
+		{% endif %}
+	</td>
 	<td>{{job.title}}</td>
 	<td>{{job.get_status_display}}</td>
 	<td>{{job.created|date}} {{job.created|time}}</td>
-	<td><a href="{% url rtv:ingest job_id=job.pk %}">publish</a></td>
+	<td>
+		{% if job.status == job.STATUS_PROCESSED %}
+		<a href="{% url rtv:ingest job_id=job.pk %}">publish</a>
+		{% else %}
+		<em>(waiting for processing to complete)</em>
+		{% endif %}
+	</td>
 </tr>
 {% empty %}
 <tr>no jobs...</tr>

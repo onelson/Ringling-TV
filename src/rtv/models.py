@@ -102,7 +102,12 @@ class TranscodeJob(models.Model):
         
     def get_info(self):
         return json.loads(self.info)
-
+    @property
+    def width(self):
+        return int(self.get_info()['video'][0]['width'])
+    @property
+    def height(self):
+        return int(self.get_info()['video'][0]['height'])
 class TranscodeJobForm(ModelForm):
     class Meta:
         model = TranscodeJob

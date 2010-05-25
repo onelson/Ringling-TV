@@ -3,18 +3,25 @@ import rtv
 from rtv.models import TranscodeJob, TranscodeJobForm
 from rtv.fedora.datastream.forms import DublinCoreForm
 from django.shortcuts import render_to_response, get_object_or_404, redirect
+from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.contrib.auth.models import User
             
 def demo(request):
-    objects = TranscodeJob.objects.filter(
+    processed = TranscodeJob.objects.filter(
                 status=TranscodeJob.STATUS_PROCESSED)
-    if objects.count() > 0: 
-        vids = list(objects)[-1]
-    else: vids = None
+    if processed.count() > 0:
+        latest = list(processed.values_list('pk', flat=True))[-1]
+    else: latest = False
+    id = request.GET.get('id', latest)
+    
+    if id:
+        vid = TranscodeJob.objects.get(pk=int(id))
+    else: vid = None
     return render_to_response('rtv/demo.html',
         {'rtv_version': rtv.get_version(),'title': "This is the rtv demo page", 
-            'vids': [vids]}, 
+            'vid': vid,
+            'links': processed.values_list('pk', 'title')}, 
         RequestContext(request))
 
 def upload(request):
@@ -29,7 +36,7 @@ def upload(request):
             basename, ext = os.path.splitext(os.path.basename(file.name))
             job.raw.save(basename+'_source'+ext, file, save=True)
             job.set_info()
-            return redirect(info)
+            return redirect(reverse('rtv:queue'))
     context = {
         'rtv_version': rtv.get_version(),
         'title': "This is the rtv upload page",
