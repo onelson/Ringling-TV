@@ -22,11 +22,12 @@ def upload(request):
         form = TranscodeJobForm(request.POST, request.FILES)
         if form.is_valid():
             vals = form.cleaned_data
-            file = vals.pop('source')
+            file = vals.pop('raw')
             vals['user'] = list(User.objects.all())[0]
-            video = TranscodeJob.objects.create(**vals)
+            job = TranscodeJob.objects.create(**vals)
             basename, ext = os.path.splitext(os.path.basename(file.name))
-            video.source.save(basename+'_source'+ext, file, save=True)
+            job.raw.save(basename+'_source'+ext, file, save=True)
+            job.set_info()
             return redirect(success)
     context = {
         'rtv_version': rtv.get_version(),

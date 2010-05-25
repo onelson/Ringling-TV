@@ -3,6 +3,7 @@ A collection of Django Models and related forms used in the fedora ingest
 process. 
 """
 
+import json
 from django.db import models
 from django.contrib.auth.models import User
 from django.forms import ModelForm
@@ -10,9 +11,10 @@ from django.core.files import File
 import datetime, os
 from rtv.transcoder import theora, h264, jpeg, TranscodeError
 from rtv.settings import RTV_PID_NAMESPACE
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE
 from rtv import settings
 from rtv.storage import PermenantStorage
+
 perm_storage = PermenantStorage()
 
 
@@ -61,8 +63,8 @@ class TranscodeJob(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     transcoded = models.DateTimeField(null=True, editable=False)
     
-    source_media = models.TextField(TranscodeJob.transcode.line, editable=False)
-    
+    info = models.TextField(editable=False, null=True)
+        
     def transcode(self):
         self.status = self.STATUS_PROCESSING
         self.save()
@@ -76,15 +78,10 @@ class TranscodeJob(models.Model):
             
             ogv = theora(self.raw.path)
             self.ogv.save(base+'_theora.ogv', File(open(ogv,'rb')))
-            
-            proc = Popen('%s' % settings.RTV_FFMPEG2THEORA, stdout=PIPE)
-            (stdout,stderr) = proc.communicate()
-            print stderr
-            for line in stdout.splitlines():
-                print line
                 
             self.status = self.STATUS_PROCESSED
             self.transcoded = datetime.datetime.now()
+            self.save()
             # cleanup
             for file in [jpg, mp4, ogv]:
                 os.remove(file)    
@@ -92,15 +89,20 @@ class TranscodeJob(models.Model):
             self.STATUS_ERROR
             self.save()
             raise err
+        
     def __unicode__(self):
         return unicode('<TranscodeJob: %s>' % (self.pk  or 'undefined')[0])
     def __str__(self): 
         return str(self.__unicode__())
 
+    def set_info(self):
+        cmd = '''%s --info "%s"''' % (settings.RTV_FFMPEG2THEORA, self.raw.path)
+        self.info = Popen(cmd, stdout=PIPE).communicate()[0]
+        self.save()
+        
+    def get_info(self):
+        return json.loads(self.info)
+
 class TranscodeJobForm(ModelForm):
-    def __unicode__(self):
-        return unicode('<TranscodeJob>')
-    def __str__(self): 
-        return str(self.__unicode__())
     class Meta:
         model = TranscodeJob

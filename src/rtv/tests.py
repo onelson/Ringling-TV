@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.files import File
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
-import rtv.settings
+from rtv.settings import check_bins
 from rtv.fedora.models import Video
 from rtv.fedora.cmodels import install_episode
 from rtv.models import TranscodeJob
@@ -12,14 +12,16 @@ from rtv.storage import PermenantStorage
 
 class SettingsTest(TestCase):
     def testBinariesAreAvailabe(self):
-        rtv.settings.check_bins()
+        check_bins()
 
 class StorageTest(TestCase):
     def setUp(self): 
         self.tempfile = str(uuid.uuid4())
     def tearDown(self):
-        if os.path.exists(self.tempfile):
-            os.remove(self.tempfile)
+        path = os.path.join(settings.MEDIA_ROOT, self.tempfile) 
+        if os.path.exists(path):
+            os.remove(path)
+            
     def testPermenantStorageIsPermenant(self):
         storage = PermenantStorage()
         path = storage.save(self.tempfile, ContentFile('new content'))
@@ -60,7 +62,7 @@ class TranscodeJobTest(TestCase):
         vfh = File(open(vid_file,'rb'))
         self.created_vid = {'size':os.path.getsize(vfh.name)}
         vid = TranscodeJob.objects.create(user=self.user, title='test video')
-        ext = os.path.splitext(vfh.name)[0] 
+        ext = os.path.splitext(vfh.name)[1] 
         vid.raw.save('tmp'+ext,vfh, save=True)
         return vid
     
@@ -76,6 +78,15 @@ class TranscodeJobTest(TestCase):
         
     def testCreate(self):
         self.assertTrue(os.path.exists(self.vid.raw.path))
+        
+    def testGetSetInfo(self):
+        self.vid.set_info()
+        self.assertTrue(len(self.vid.info) > 0)
+        info_type = type(self.vid.get_info())
+        self.assertNotEquals('str', info_type)
+        self.assertTrue('dict', info_type)
+        self.assertTrue('video' in self.vid.get_info())
+        
     def testGet(self):
         TranscodeJob.objects.get(pk=self.vid.pk)
 

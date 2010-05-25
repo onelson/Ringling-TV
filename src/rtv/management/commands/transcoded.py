@@ -16,7 +16,8 @@ if getattr(settings, 'DEBUG', False):
     level = logging.DEBUG
 else:
     level = logging.INFO
-logging.basicConfig(filename=LOG_FILE, level=level)
+
+logging.basicConfig(filename=LOG_FILE, level=logging.INFO)
 
 LOG = logging.getLogger('Transcode.d')
 LOG.addHandler(logging.StreamHandler())
@@ -35,6 +36,16 @@ ACTIONS = {
 
 ACTION_DEFAULT = ACTION_HELP
 class Command(BaseCommand):
+    
+    option_list = BaseCommand.option_list + (
+        make_option('--detach', '-d', 
+                    dest='detach',
+                    action='store_true',
+                    default=False,
+                    help='daemonize the process'
+        ),
+    )
+    
     action = ACTION_DEFAULT
     help = 'action required: start | stop | restart'
     
@@ -47,7 +58,7 @@ class Command(BaseCommand):
             raise AlreadyRunningError('Daemon is already running. Try to "stop"'
                                       ' or "restart"')
         print >> sys.stdout, 'Done.'
-        daemonize()
+        if self.opts['detach']: daemonize()
         write_pid()
         LOG.info('== init ==')
         LOG.info('Daemon started: [%d]' % read_pid())
@@ -89,6 +100,7 @@ class Command(BaseCommand):
         self._start()
     
     def handle(self, *args, **opts):
+        self.opts = opts
         try:
             self.action = ACTIONS[args[0]]
         except (KeyError, IndexError):
