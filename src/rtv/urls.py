@@ -3,9 +3,10 @@ handler500 # Pyflakes
 
 urlpatterns = patterns(
     'rtv.views',
-    url(r'^$', 'demo'),
-    url(r'^demo/$', 'demo', name='demo_view'),
-    url(r'^upload/$', 'upload', name='upload_view'),
-    url(r'^success/$', 'success', name='success_view'),
-    url(r'^info/$', 'info'),
+    url(r'^$', 'demo', name='index'),
+    url(r'^demo/$', 'demo', name='demo'),
+    url(r'^upload/$', 'upload', name='upload'),
+    url(r'^success/$', 'success', name='success'),
+    url(r'^publish-queue/$', 'info', name='queue'),
+    url(r'^ingest/(?P<job_id>\d+)/$', 'ingest', name='ingest'),
 )

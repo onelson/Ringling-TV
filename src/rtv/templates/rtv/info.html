@@ -1,16 +1,21 @@
 {% block content %}
 <h2>Jobs: {{jobs.length}}</h2>
 <table>
+{% for job in jobs %}
+{% if forloop.first %}
 	<tr>
 		<td>title</td>
 		<td>status</td>
 		<td>created</td>
 	</tr>
-{% for job in jobs %}
+{% endif %}
 <tr>
 	<td>{{job.title}}</td>
 	<td>{{job.get_status_display}}</td>
 	<td>{{job.created|date}} {{job.created|time}}</td>
+	<td><a href="{% url rtv:ingest job_id=job.pk %}">publish</a></td>
 </tr>
+{% empty %}
+<tr>no jobs...</tr>
 {% endfor %}
 {% endblock content %}
