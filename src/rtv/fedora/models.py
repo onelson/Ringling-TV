@@ -31,8 +31,7 @@ class FedoraObjectSet(object):
         return str(list(self.data))
     def __nonzero__(self):
         return bool(self.data)
-    def __len__(self): return self.count()
-    def count(self): return len(self.data)
+    def __len__(self): return len(self.data)
 
 
 class FedoraDatastream(object):
