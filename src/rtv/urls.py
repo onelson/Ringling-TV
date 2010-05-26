@@ -9,4 +9,5 @@ urlpatterns = patterns(
     url(r'^success/$', 'success', name='success'),
     url(r'^publish-queue/$', 'info', name='queue'),
     url(r'^ingest/(?P<job_id>\d+)/$', 'ingest', name='ingest'),
+    url(r'^view/(?P<pid>\w+:\d+)/$', 'video_detail', name='video_detail'),
 )

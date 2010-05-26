@@ -1,28 +1,21 @@
 import os
 import rtv
 from rtv.models import TranscodeJob, TranscodeJobForm
-from rtv.fedora.models import Video
+from rtv.fedora.models import Video, ObjectNotFoundError
 from rtv.fedora.datastream.forms import DublinCoreForm
+from django.http import Http404
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.contrib.auth.models import User
             
 def demo(request):
-    processed = TranscodeJob.objects.filter(
-                status=TranscodeJob.STATUS_PROCESSED)
-    if processed.count() > 0:
-        latest = list(processed.values_list('pk', flat=True))[-1]
-    else: latest = False
-    id = request.GET.get('id', latest)
-    
-    if id:
-        vid = TranscodeJob.objects.get(pk=int(id))
-    else: vid = None
+    all = Video.objects.all()
+    latest = list(all)[-1]
     return render_to_response('rtv/demo.html',
         {'rtv_version': rtv.get_version(),'title': "This is the rtv demo page", 
-            'vid': vid,
-            'links': processed.values_list('pk', 'title')}, 
+            'vid': latest,
+            'all': Video.objects.all()}, 
         RequestContext(request))
 
 def upload(request):
@@ -76,6 +69,7 @@ def ingest(request, job_id):
                                  mp4=job.mp4.url, ogv=job.ogv.url, 
                                  thumbnail=job.thumbnail.url, 
                                  dc=form.cleaned_data)
+            job.delete()
             return redirect(reverse('rtv:queue'))
         
     context = {'rtv_version': rtv.get_version(),
@@ -83,4 +77,16 @@ def ingest(request, job_id):
                'form': form }
     return render_to_response('rtv/ingest.html',
         context, 
-        RequestContext(request))    
+        RequestContext(request))
+    
+def video_detail(request, pid):
+    try: 
+        video = Video.objects.get(pid=pid)
+    except ObjectNotFoundError:
+        raise Http404
+    context = {'rtv_version': rtv.get_version(),
+               'title': 'This is the rtv video detail page',
+               'object': video }
+    return render_to_response('rtv/video_detail.html',
+        context, 
+        RequestContext(request))

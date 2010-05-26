@@ -9,6 +9,7 @@ storage.  Tread carefully when using these classes.
 from rtv.settings import RTV_PID_NAMESPACE
 from rtv.fedora import NS, pp, get_client
 from fcrepo.connection import FedoraConnectionException
+from django.core.urlresolvers import reverse
 
 class FedoraObjectSet(object):
     """
@@ -223,13 +224,16 @@ class Video(FedoraObject):
     
     @property
     def thumbnail(self):
-        return self.__fcobj__['THUMBNAIL']
+        return self.__fcobj__['THUMBNAIL'].location
     @property
     def ogv(self):
-        return self.__fcobj__['OGV']
+        return self.__fcobj__['OGV'].location
     @property
     def mp4(self):
-        return self.__fcobj__['MP4']
+        return self.__fcobj__['MP4'].location
     @property
     def raw(self):
-        return self.__fcobj__['RAW']
+        return self.__fcobj__['RAW'].location
+
+    def get_absolute_url(self):
+        return reverse('rtv:video_detail', kwargs={'pid': self.pid })
