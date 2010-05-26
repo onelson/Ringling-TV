@@ -19,6 +19,10 @@ class FedoraObjectSet(object):
         self.klass = klass
         self.data = data
         self.index = 0
+    
+    def index(self, i):
+        return self.data[i]
+    
     def __iter__(self):
         return self
     def next(self):
@@ -26,6 +30,7 @@ class FedoraObjectSet(object):
         try:
             return self.klass(pid=self.data[self.index])
         except IndexError:
+            self.index = 0
             raise StopIteration
     def __str__(self): 
         return str(list(self.data))
@@ -193,7 +198,10 @@ class VideoObjectManager(FedoraObjectManager):
         pids = []
         for r in result:
             pids.append(unicode(r['s']['value'].replace('info:fedora/','')))
-        return FedoraObjectSet(klass=Video, data=pids)
+#        return FedoraObjectSet(klass=Video, data=pids)
+# return a standard sequence until I can customize the FedoraObjectSet more
+        vids = [Video(pid) for pid in pids]
+        return vids
     
     @staticmethod
     def get(**kwargs):

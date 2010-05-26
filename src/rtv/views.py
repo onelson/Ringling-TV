@@ -12,14 +12,14 @@ from django.contrib.auth.models import User
 def demo(request):
     all = Video.objects.all()
     if all:
-        latest = list(all)[-1]
+        latest = all[-1]
     else:
         latest = None
         
     return render_to_response('rtv/demo.html',
         {'rtv_version': rtv.get_version(),'title': "This is the rtv demo page", 
             'vid': latest,
-            'all': Video.objects.all()}, 
+            'all': all}, 
         RequestContext(request))
 
 def upload(request):
