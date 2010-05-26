@@ -207,7 +207,7 @@ class VideoObjectManager(FedoraObjectManager):
             raise MultipleResultsError('Search yielded %d results' % len(results))
         elif len(results) == 0:
             raise ObjectNotFoundError('The search "%s" yielded 0 results' % query)
-        return results[0]
+        return Video(pid=results[0]['pid'])
 
 class MultipleResultsError(Exception):pass
 class ObjectNotFoundError(Exception):pass
