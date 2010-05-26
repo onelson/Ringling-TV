@@ -29,7 +29,8 @@ class FedoraObjectSet(object):
             raise StopIteration
     def __str__(self): 
         return str(list(self.data))
-
+    def __nonzero__(self):
+        return bool(self.data)
     def __len__(self): return self.count()
     def count(self): return len(self.data)
 
