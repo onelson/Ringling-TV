@@ -14,18 +14,23 @@ class FedoraObjectSet(object):
     """
     Iterator for looping over a sequence of FedoraObjects
     """
-    def __init__(self, data):
+    def __init__(self, klass, data):
+        self.klass = klass
         self.data = data
         self.index = 0
     def __iter__(self):
         return self
     def next(self):
-        if self.index == len(self.data):
-            raise StopIteration
         self.index = self.index + 1
-        return self.data[self.index]
+        try:
+            return self.klass(pid=self.data[self.index])
+        except IndexError:
+            raise StopIteration
     def __str__(self): 
         return str(list(self.data))
+
+    def __len__(self): return self.count()
+    def count(self): return len(self.data)
 
 
 class FedoraDatastream(object):
@@ -46,10 +51,6 @@ class FedoraDatastream(object):
     
     def set(self, prop, val):
         return setattr(self._obj[self._name], prop, val)
-    def __unicode__(self):
-        return unicode('<FedoraDataStream: %s>' % (self.pk  or 'undefined')[0])
-    def __str__(self): 
-        return str(self.__unicode__())
 
 class FedoraObjectManager(object):
     __cmodel__ = None
@@ -63,50 +64,71 @@ class FedoraObjectManager(object):
     @staticmethod
     def purge(pid):
         client = get_client()
-        client.deleteObject(pid)
+        client.deleteObject(unicode(pid))
     @staticmethod
     def get(**kwargs):
         raise NotImplementedError
-    def __unicode__(self):
-        return unicode('<FedoraObjectManager: %s>' % (self.pk  or 'undefined')[0])
-    def __str__(self): 
-        return str(self.__unicode__())
 
 class FedoraObject(object):
     """
     An abstract base class for fedora objects.
     """
-    pid = None
+    _pid = None
+    _fcobject_cache = None
     objects = FedoraObjectManager()
     __datastreams__ = []
     
-    def _datastream(self, name):
-        def _get(name):
-            return self.pid
-        return property()
+    def _get_pid(self):
+        return self._pid
+    def _set_pid(self, value):
+        self._pid = unicode(value)
+    def _del_pid(self):
+        self._pid = None
+        self._fcobject_cache = None
+    pid = property(_get_pid, _set_pid, _del_pid)
     
-    def _props_to_fedora(self):
+    @property
+    def __fcobj__(self):
+        fc = get_client()
+        if not self._fcobject_cache:
+            self._fcobject_cache = fc.getObject(self.pid)
+        return self._fcobject_cache 
+    
+    @property
+    def datastreams(self):
+        return self.__fcobj__.datastreams()
+    
+    def _to_fedora(self):
+        """
+        Should return a set of nested dicts that can be passed directly to the
+        object manager for insert/update.
+        """
         raise NotImplementedError
     
-    def __init__(self, **kwargs):
+    def _bind(self, pid=None, **kwargs):
+        """
+        Maps a dict of fedora data to the object properties.
+        """
+        raise NotImplementedError
+    
+    def __init__(self, pid=None, **kwargs):
+        if pid:
+            self.pid = unicode(pid)
         if kwargs:
-            self._load(**kwargs)
+            self._bind(**kwargs)
     
     def save(self):
         client = get_client()
         try:
-            client.getObject(self.pid)
-            is_new = False
-        except FedoraConnectionException:
-            is_new = True
-        if is_new:
-            self.objects.create(**self._props_to_fedora())
-        else:
+            client.getObject(self._pid)
             self.objects.update(**self._props_to_fedora())
+        except FedoraConnectionException:
+            self.objects.create(**self._props_to_fedora())
+            
     def delete(self):
         self.objects.purge(self.pid)
     def __unicode__(self):
-        return unicode('<FedoraObject: %s>' % (self.pid  or 'undefined')[0])
+        return unicode('<FedoraObject: %s>' % (self.pid  or 'undefined'))
     def __str__(self): 
         return str(self.__unicode__())
     
@@ -134,6 +156,7 @@ class VideoObjectManager(FedoraObjectManager):
                 dcore[k] = unicode(v)
             dcore.setContent()
         dstreams = (
+            # datastream name, url, mimetype
             ('RAW', raw, u'application/octet-stream'),
             ('MP4', mp4, u'video/mp4'),
             ('OGV', ogv, u'video/ogv'),
@@ -158,30 +181,55 @@ class VideoObjectManager(FedoraObjectManager):
         return VideoObjectManager.get(pid=pid)
             
     @staticmethod
-    def get(**kwargs): pass
+    def all():
+        fc = get_client()
+#        all = fc.searchObjects(unicode('pid~'+RTV_PID_NAMESPACE+':*'), ['pid',])
+        sparql = '''prefix rdfs: <%s>
+        select ?s where {?s rdfs:hasModel <%s>.}
+        ''' % (NS.rdfs, VideoObjectManager.__cmodel__)
+        result = fc.searchTriples(sparql)
+
+        pids = []
+        for r in result:
+            pids.append(unicode(r['s']['value'].replace('info:fedora/','')))
+        return FedoraObjectSet(klass=Video, data=pids)
+    
+    @staticmethod
+    def get(**kwargs):
+        fc = get_client()
+        subqueries = []
+        fields = kwargs.keys()
+        for k,v in kwargs.iteritems():
+            subqueries.append(''.join([k,'~',v]))
+        query = unicode(' '.join(subqueries))
+        results = [obj for obj in fc.searchObjects(query, fields)]
+        if len(results) > 1: 
+            raise MultipleResultsError('Search yielded %d results' % len(results))
+        elif len(results) == 0:
+            raise ObjectNotFoundError('The search "%s" yielded 0 results' % query)
+        return results[0]
+
+class MultipleResultsError(Exception):pass
+class ObjectNotFoundError(Exception):pass
+
+class Video(FedoraObject):
+    objects = VideoObjectManager()
+    def _bind(self, pid=None, **kwargs):pass
+    def _new(self):pass
     def __unicode__(self):
-        return unicode('<VideoObjectManager: %s>' % (self.pid  or 'undefined')[0])
+        return unicode('<Video: %s>' % (self.pid  or 'undefined'))
     def __str__(self): 
         return str(self.__unicode__())
     
-class Video(FedoraObject):
-    user = None
-    pid = None
-    title = None
-    objects = VideoObjectManager()
-
-    def _new(self):
-        self.pid = self._client.getNextPid(RTV_PID_NAMESPACE)
-        obj = self._client.createObject(self.pid, label=self.title)
-        obj.addDataStream(u'RELS-EXT')
-        rels = obj['RELS-EXT']
-        rels[NS.rdfs.hasModel].append(dict(
-            type = u'uri',
-            value = u'info:fedora/'+pp('EPISODE')
-        ))
-        rels.checksumType = u'DISABLED'
-        rels.setContent()
-    def __unicode__(self):
-        return unicode('<Video: %s>' % (self.pid  or 'undefined')[0])
-    def __str__(self): 
-        return str(self.__unicode__())
+    @property
+    def thumbnail(self):
+        return self.__fcobj__['THUMBNAIL']
+    @property
+    def ogv(self):
+        return self.__fcobj__['OGV']
+    @property
+    def mp4(self):
+        return self.__fcobj__['MP4']
+    @property
+    def raw(self):
+        return self.__fcobj__['RAW']

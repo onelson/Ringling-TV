@@ -91,7 +91,7 @@ class TranscodeJob(models.Model):
             raise err
         
     def __unicode__(self):
-        return unicode('<TranscodeJob: %s>' % (self.pk  or 'undefined')[0])
+        return unicode('<TranscodeJob: %s>' % (self.pk  or 'undefined'))
     def __str__(self): 
         return str(self.__unicode__())
 

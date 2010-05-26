@@ -1,6 +1,7 @@
 import os
 import rtv
 from rtv.models import TranscodeJob, TranscodeJobForm
+from rtv.fedora.models import Video
 from rtv.fedora.datastream.forms import DublinCoreForm
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.core.urlresolvers import reverse
@@ -70,6 +71,12 @@ def ingest(request, job_id):
     
     if request.method == 'POST':
         form = DublinCoreForm(request.POST)
+        if form.is_valid():
+            Video.objects.create(user=job.user.username, raw=job.raw.url, 
+                                 mp4=job.mp4.url, ogv=job.ogv.url, 
+                                 thumbnail=job.thumbnail.url, 
+                                 dc=form.cleaned_data)
+            return redirect(reverse('rtv:queue'))
         
     context = {'rtv_version': rtv.get_version(),
                'title': 'This is the rtv ingest page',
