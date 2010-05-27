@@ -10,7 +10,7 @@ from rtv.settings import RTV_PID_NAMESPACE
 from rtv.fedora import NS, pp, get_client
 from fcrepo.connection import FedoraConnectionException
 from django.core.urlresolvers import reverse
-import json
+import json, datetime
 
 class FedoraObjectSet(object):
     """
@@ -245,6 +245,18 @@ class Video(FedoraObject):
     @property
     def dc(self):
         return self.__fcobj__['DC']
+    @property
+    def title(self):
+        return self.dc['title'][0]
+    @property
+    def description(self):
+        return self.dc['description'][0]
+    @property
+    def date(self):
+        try:
+            return datetime.date(*[int(n) for n in self.dc['date'][0].split('-')])
+        except IndexError:
+            return None
     @property
     def dc_as_dict(self):
         return dict(self.dc)

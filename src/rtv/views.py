@@ -64,7 +64,7 @@ def ingest(request, job_id):
                                                 or job.user.username), 
                 'type': 'video',
                 'language': 'eng',
-                'date': datetime.datetime.today() }
+                'date': datetime.date.today() }
     form = DublinCoreForm(job_data)
     
     if request.method == 'POST':
