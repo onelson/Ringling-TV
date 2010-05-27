@@ -4,8 +4,8 @@
 <style type="text/css">
 	.vid {
 		display:block;
-		width: 320px;
-		height: 240px;
+		width: {{vid.width}}px;
+		height: {{vid.height}}px;
 	}
 	dl#links {
 		position: absolute;
@@ -25,7 +25,7 @@
 	<source src="{{vid.ogv}}" type="video/ogg" />
 	<a href="{{vid.mp4}}" id="player" class="vid"></a>
 </video>
-<pre>{{vid.info}}</pre>
+<pre>{{vid.raw_info}}</pre>
 </div>
 
 {% endif %}

@@ -23,6 +23,9 @@ def install_episode():
       <dsTypeModel ID="RAW">
         <form MIME="application/octet-stream"></form>
       </dsTypeModel>
+      <dsTypeModel ID="RAW_INFO">
+        <form MIME="text/plain"></form>
+      </dsTypeModel>
       <dsTypeModel ID="MP4">
         <form MIME="video/mp4"></form>
       </dsTypeModel>

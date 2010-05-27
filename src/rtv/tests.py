@@ -100,12 +100,13 @@ class TranscodeJobTest(TestCase):
         most labor.
         """
         self.vid.transcode()
+        self.vid.set_info()
         self.assertEqual(self.vid.status, self.vid.STATUS_PROCESSED)
         self.assertTrue(os.path.exists(self.vid.ogv.path))
         self.assertTrue(os.path.exists(self.vid.mp4.path))
         self.assertTrue(os.path.exists(self.vid.thumbnail.path))
         tj = self.vid
         Video.objects.create(user=tj.user.username, raw=tj.raw.url, 
-                    mp4=tj.mp4.url, ogv=tj.ogv.url, thumbnail=tj.thumbnail.url, 
-                    dc=dict(title=tj.title))
+                             raw_info=tj.info, mp4=tj.mp4.url, ogv=tj.ogv.url, 
+                             thumbnail=tj.thumbnail.url, dc={'title':tj.title})
 

@@ -5,8 +5,8 @@
 	.vid {
 		display:block;
 		/* needs to be driven by object.width and object.height */
-		width: 320px;
-		height: 240px;
+		width: {{object.width}}px;
+		height: {{object.height}}px;
 	}
 	dl#links {
 		position: absolute;
@@ -20,11 +20,14 @@
 </style>
 
 <div id="feature">
-<video poster="{{object.thumbnail}}" controls="controls" class="vid">
-    <source src="{{object.mp4}}" type="video/mp4" />
-	<source src="{{object.ogv}}" type="video/ogg" />
-	<a href="{{object.mp4}}" id="player" class="vid"></a>
-</video>
+	<video poster="{{object.thumbnail}}" controls="controls" class="vid">
+	    <source src="{{object.mp4}}" type="video/mp4" />
+		<source src="{{object.ogv}}" type="video/ogg" />
+		<a href="{{object.mp4}}" id="player" class="vid"></a>
+	</video>
+	<div class="dcore">
+		{% include 'rtv/dublin_core.html' %}	
+	</div>
 </div>
 
 <dl id="links">

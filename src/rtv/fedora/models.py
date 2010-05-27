@@ -10,10 +10,12 @@ from rtv.settings import RTV_PID_NAMESPACE
 from rtv.fedora import NS, pp, get_client
 from fcrepo.connection import FedoraConnectionException
 from django.core.urlresolvers import reverse
+import json
 
 class FedoraObjectSet(object):
     """
-    Iterator for looping over a sequence of FedoraObjects
+    Iterator for looping over a sequence of FedoraObjects.  
+    Not fully implemented at this point - and therefore not in use.
     """
     def __init__(self, klass, data):
         self.klass = klass
@@ -38,25 +40,6 @@ class FedoraObjectSet(object):
         return bool(self.data)
     def __len__(self): return len(self.data)
 
-
-class FedoraDatastream(object):
-    _obj = None
-    _controlGroup = None
-    _versionable = None
-    _name = None
-    def __init__(self, instance, name, controlGroup, versionable):
-        self._obj = instance # reference to the parent object
-        self._name = unicode(name)
-        self._controlGroup = unicode(controlGroup)
-        self._versionable = bool(versionable)
-    def get(self, prop):
-        """
-        Return the value of datastream.prop
-        """
-        return getattr(self._obj[self._name], prop)
-    
-    def set(self, prop, val):
-        return setattr(self._obj[self._name], prop, val)
 
 class FedoraObjectManager(object):
     __cmodel__ = None
@@ -95,8 +78,8 @@ class FedoraObject(object):
     
     @property
     def __fcobj__(self):
-        fc = get_client()
         if not self._fcobject_cache:
+            fc = get_client()
             self._fcobject_cache = fc.getObject(self.pid)
         return self._fcobject_cache 
     
@@ -140,9 +123,8 @@ class FedoraObject(object):
     
 class VideoObjectManager(FedoraObjectManager):
     __cmodel__ = u'info:fedora/'+pp('EPISODE')
-    __datastreams__ = ['DC', 'RELS-EXT', 'MP4', 'OGV', 'THUMBNAIL']
     @staticmethod
-    def create(user, raw, mp4, ogv, thumbnail, dc={}):
+    def create(user, raw, raw_info, mp4, ogv, thumbnail, dc={}):
         fc = get_client()
         pid = fc.getNextPID(RTV_PID_NAMESPACE)
         
@@ -158,18 +140,25 @@ class VideoObjectManager(FedoraObjectManager):
         if dc:
             dcore = obj['DC']
             dcore.versionable = False
-            for k, v in dc.iteritems():
-                dcore[k] = unicode(v)
+            for key in dc:
+                dcore[key] = [unicode(dc[key])]
             dcore.setContent()
+        # info on raw media
+        obj.addDataStream('RAW_INFO', raw_info, controlGroup=u'M', 
+                                 label=u'source media info', mimeType=u'text/plain',
+                                 checksumType=u'DISABLED', versionable=False)
+        info = obj['RAW_INFO']
+        info.setContent()
+        # media datastreams
         dstreams = (
             # datastream name, url, mimetype
-            ('RAW', raw, u'application/octet-stream'),
-            ('MP4', mp4, u'video/mp4'),
-            ('OGV', ogv, u'video/ogv'),
-            ('THUMBNAIL', thumbnail, u'image/jpeg')
+            ('RAW', raw, u'application/octet-stream', u'R'),
+            ('MP4', mp4, u'video/mp4', u'R'),
+            ('OGV', ogv, u'video/ogv', u'R'),
+            ('THUMBNAIL', thumbnail, u'image/jpeg', u'R')
         )
-        for (dsname, url, mime)in dstreams:
-            obj.addDataStream(dsname, controlGroup=u'R',
+        for (dsname, url, mime, cgroup) in dstreams:
+            obj.addDataStream(dsname, controlGroup=cgroup,
                                             label = u'media ds', 
                                             logMessage = u'adding ds',
                                             location = unicode(url),
@@ -189,7 +178,6 @@ class VideoObjectManager(FedoraObjectManager):
     @staticmethod
     def all():
         fc = get_client()
-#        all = fc.searchObjects(unicode('pid~'+RTV_PID_NAMESPACE+':*'), ['pid',])
         sparql = '''prefix rdfs: <%s>
         select ?s where {?s rdfs:hasModel <%s>.}
         ''' % (NS.rdfs, VideoObjectManager.__cmodel__)
@@ -198,8 +186,6 @@ class VideoObjectManager(FedoraObjectManager):
         pids = []
         for r in result:
             pids.append(unicode(r['s']['value'].replace('info:fedora/','')))
-#        return FedoraObjectSet(klass=Video, data=pids)
-# return a standard sequence until I can customize the FedoraObjectSet more
         vids = [Video(pid) for pid in pids]
         return vids
     
@@ -245,3 +231,20 @@ class Video(FedoraObject):
 
     def get_absolute_url(self):
         return reverse('rtv:video_detail', kwargs={'pid': self.pid })
+    @property
+    def raw_info(self):
+        return self.__fcobj__['RAW_INFO'].getContent().read()
+    def get_info(self):
+        return json.loads(self.raw_info)
+    @property
+    def width(self):
+        return int(self.get_info()['video'][0]['width'])
+    @property
+    def height(self):
+        return int(self.get_info()['video'][0]['height'])
+    @property
+    def dc(self):
+        return self.__fcobj__['DC']
+    @property
+    def dc_as_dict(self):
+        return dict(self.dc)

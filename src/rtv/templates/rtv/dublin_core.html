@@ -1,0 +1,10 @@
+<dl>
+{% for k,v in object.dc_as_dict.items %}
+	<dt>
+		{{k}}
+	</dt>
+	<dd>
+		{{ v.0 }}
+	</dd>
+{% endfor %}
+</dl>

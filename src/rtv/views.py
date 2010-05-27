@@ -1,4 +1,4 @@
-import os
+import os, datetime
 import rtv
 from rtv.models import TranscodeJob, TranscodeJobForm
 from rtv.fedora.models import Video, ObjectNotFoundError
@@ -63,15 +63,16 @@ def ingest(request, job_id):
     job_data = {'title': job.title, 'creator': (job.user.get_full_name() 
                                                 or job.user.username), 
                 'type': 'video',
-                'language': 'eng' }
+                'language': 'eng',
+                'date': datetime.datetime.today() }
     form = DublinCoreForm(job_data)
     
     if request.method == 'POST':
         form = DublinCoreForm(request.POST)
         if form.is_valid():
             Video.objects.create(user=job.user.username, raw=job.raw.url, 
-                                 mp4=job.mp4.url, ogv=job.ogv.url, 
-                                 thumbnail=job.thumbnail.url, 
+                                 raw_info=job.info, mp4=job.mp4.url, 
+                                 ogv=job.ogv.url, thumbnail=job.thumbnail.url, 
                                  dc=form.cleaned_data)
             job.delete()
             return redirect(reverse('rtv:queue'))
