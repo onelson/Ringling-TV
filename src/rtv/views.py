@@ -58,7 +58,7 @@ def info(request):
         context, 
         RequestContext(request))
 
-def ingest(request, job_id):
+def video_ingest(request, job_id):
     job = get_object_or_404(TranscodeJob, pk=int(job_id))
     job_data = {'title': job.title, 'creator': (job.user.get_full_name() 
                                                 or job.user.username), 
@@ -80,7 +80,16 @@ def ingest(request, job_id):
     context = {'rtv_version': rtv.get_version(),
                'title': 'This is the rtv ingest page',
                'form': form }
-    return render_to_response('rtv/ingest.html',
+    return render_to_response('rtv/video_ingest.html',
+        context, 
+        RequestContext(request))
+
+def video_list(request):
+    videos = Video.objects.all()
+    context = {'rtv_version': rtv.get_version(),
+               'title': 'This is the rtv video list page',
+               'object_list': videos }
+    return render_to_response('rtv/video_list.html',
         context, 
         RequestContext(request))
     
@@ -95,3 +104,36 @@ def video_detail(request, pid):
     return render_to_response('rtv/video_detail.html',
         context, 
         RequestContext(request))
+
+def video_update(request, pid):
+    video = Video.objects.get(pid=pid)
+    form = DublinCoreForm(video.dc_as_dict())
+    
+    if request.method == 'POST':
+        form = DublinCoreForm(request.POST)
+        if form.is_valid():
+            video.dict_to_dc(form.cleaned_data)
+            return redirect(reverse('rtv:video_list'))
+    context = {'rtv_version': rtv.get_version(),
+               'title': 'This is the rtv ingest page',
+               'form': form }
+    return render_to_response('rtv/video_update.html',
+        context, 
+        RequestContext(request))
+
+def video_state(request, pid, state):
+    """
+    Toggles between 'A' and 'D' states
+    """ 
+    vid = Video.objects.get(pid=pid)
+    vid.__fcobj__.state = unicode(state)
+    return redirect(reverse('rtv:video_list'))
+
+def video_delete(request, pid):
+    """
+    Displays a confirmation page, with a simple delete form.
+    This will purge the object from the repo: final death, no regeneration!
+    """ 
+    vid = Video.objects.get(pid=pid)
+    vid.delete()
+    return redirect(reverse('rtv:video_list'))

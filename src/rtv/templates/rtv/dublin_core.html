@@ -1,10 +1,76 @@
 <dl>
-{% for k,v in object.dc_as_dict.items %}
-	<dt>
-		{{k}}
-	</dt>
-	<dd>
-		{{ v.0 }}
-	</dd>
-{% endfor %}
+{% if object.title %}
+<dt>title</dt>
+<dd>{{object.title}}</dd>
+{% endif %}
+
+{% if object.date %}
+<dt>date</dt>
+<dd>{{object.date|date}}</dd>
+{% endif %}
+
+{% if object.description %}
+<dt>description</dt>
+<dd>{{object.description}}</dd>
+{% endif %}
+
+{% if object.type %}
+<dt>type</dt>
+<dd>{{object.type}}</dd>
+{% endif %}
+
+{% if object.format %}
+<dt>format</dt>
+<dd>{{object.format}}</dd>
+{% endif %}
+
+{% if object.language %}
+<dt>language</dt>
+<dd>{{object.language}}</dd>
+{% endif %}
+
+{% if object.subject %}
+<dt>subject</dt>
+<dd>{{object.subject}}</dd>
+{% endif %}
+
+{% if object.coverage %}
+<dt>coverage</dt>
+<dd>{{object.coverage}}</dd>
+{% endif %}
+
+{% if object.identifier %}
+<dt>identifier</dt>
+<dd>{{object.identifier}}</dd>
+{% endif %}
+
+{% if object.creator %}
+<dt>creator</dt>
+<dd>{{object.creator}}</dd>
+{% endif %}
+
+{% if object.contributor %}
+<dt>contributor</dt>
+<dd>{{object.contributor}}</dd>
+{% endif %}
+
+{% if object.source %}
+<dt>source</dt>
+<dd>{{object.source}}</dd>
+{% endif %}
+
+{% if object.relation %}
+<dt>relation</dt>
+<dd>{{object.relation}}</dd>
+{% endif %}
+
+{% if object.publisher %}
+<dt>publisher</dt>
+<dd>{{object.publisher}}</dd>
+{% endif %}
+
+{% if object.rights %}
+<dt>rights</dt>
+<dd>{{object.rights}}</dd>
+{% endif %}
 </dl>

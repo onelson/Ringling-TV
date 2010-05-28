@@ -82,6 +82,19 @@ class FedoraObject(object):
             fc = get_client()
             self._fcobject_cache = fc.getObject(self.pid)
         return self._fcobject_cache 
+    def _get_state(self):
+        return self.__fcobj__.state
+    def _set_state(self, value):
+        self.__fcobj__.state = unicode(value)
+    state = property(_get_state, _set_state)
+    @property
+    def get_state_display(self):
+        display = {
+            'A': 'active',
+            'I': 'inactive',
+            'D': 'deleted'
+        }
+        return display[self.state]
     
     @property
     def datastreams(self):
@@ -121,6 +134,93 @@ class FedoraObject(object):
     def __str__(self): 
         return str(self.__unicode__())
     
+    @property
+    def dc(self):
+        """
+        Provides direct access to the DC datastream object.
+        """
+        return self.__fcobj__['DC']
+    
+    def dict_to_dc(self, dc):
+        """
+        Maps a dict to the fcrepo object
+        """
+        dcore = self.dc
+        dcore.versionable = False
+        for key in dc:
+            dcore[key] = [unicode(dc[key])]
+        dcore.setContent()
+    
+    def dc_as_dict(self):
+        """
+        Returns a real dict of the DC datastream (read only).
+        """
+        """
+        TODO: decide how we want to deal with multi-element values.  Currently,
+        I'm ignoring anything not in element 0, and forcing inserted data back 
+        in at element 0.
+        """ 
+        data = {}
+        for key in self.dc:
+            data[key] = self.dc[key][0]
+        return data
+    
+    def _get_dc_element(self,name):
+        try:
+            return self.dc[name][0]
+        except (IndexError, KeyError):
+            return None
+         
+    @property
+    def title(self):
+        return self._get_dc_element('title')
+    @property
+    def description(self):
+        return self._get_dc_element('description')
+    @property
+    def date(self):
+        try:
+            return datetime.datetime.strptime(self._get_dc_element('date'), '%Y-%m-%d').date()
+        except ValueError:
+            return None
+    @property
+    def creator(self):
+        return self._get_dc_element('creator')
+    @property
+    def contributor(self):
+        return self._get_dc_element('contributor')
+    @property
+    def subject(self):
+        return self._get_dc_element('subject')
+    @property
+    def format(self):
+        return self._get_dc_element('format')
+    @property
+    def identifier(self):
+        return self._get_dc_element('identifier')
+    @property
+    def language(self):
+        return self._get_dc_element('language')
+    @property
+    def source(self):
+        return self._get_dc_element('source')
+    @property
+    def relation(self):
+        return self._get_dc_element('relation')
+    @property
+    def publisher(self):
+        return self._get_dc_element('publisher')
+    @property
+    def rights(self):
+        return self._get_dc_element('rights')
+    @property
+    def type(self):
+        return self._get_dc_element('type')
+    @property
+    def coverage(self):
+        return self._get_dc_element('coverage')
+    
+    
 class VideoObjectManager(FedoraObjectManager):
     __cmodel__ = u'info:fedora/'+pp('EPISODE')
     @staticmethod
@@ -137,12 +237,6 @@ class VideoObjectManager(FedoraObjectManager):
         ))
         rels.checksumType = u'DISABLED'
         rels.setContent()
-        if dc:
-            dcore = obj['DC']
-            dcore.versionable = False
-            for key in dc:
-                dcore[key] = [unicode(dc[key])]
-            dcore.setContent()
         # info on raw media
         obj.addDataStream('RAW_INFO', raw_info, controlGroup=u'M', 
                                  label=u'source media info', mimeType=u'text/plain',
@@ -173,7 +267,10 @@ class VideoObjectManager(FedoraObjectManager):
             ds = obj[dsname]
             ds.setContent()
         
-        return VideoObjectManager.get(pid=pid)
+        vid = VideoObjectManager.get(pid=pid)
+        if dc:
+            vid.dict_to_dc(dc)
+        return vid
             
     @staticmethod
     def all():
@@ -241,22 +338,4 @@ class Video(FedoraObject):
         return int(self.get_info()['video'][0]['width'])
     @property
     def height(self):
-        return int(self.get_info()['video'][0]['height'])
-    @property
-    def dc(self):
-        return self.__fcobj__['DC']
-    @property
-    def title(self):
-        return self.dc['title'][0]
-    @property
-    def description(self):
-        return self.dc['description'][0]
-    @property
-    def date(self):
-        try:
-            return datetime.date(*[int(n) for n in self.dc['date'][0].split('-')])
-        except IndexError:
-            return None
-    @property
-    def dc_as_dict(self):
-        return dict(self.dc)
+        return int(self.get_info()['video'][0]['height'])    

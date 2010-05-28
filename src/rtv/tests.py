@@ -60,7 +60,6 @@ class TranscodeJobTest(TestCase):
         # grabbing first vid from the samples dir
         vid_file = os.path.join(samples,os.listdir(samples)[0])
         vfh = File(open(vid_file,'rb'))
-        self.created_vid = {'size':os.path.getsize(vfh.name)}
         vid = TranscodeJob.objects.create(user=self.user, title='test video')
         ext = os.path.splitext(vfh.name)[1] 
         vid.raw.save('tmp'+ext,vfh, save=True)

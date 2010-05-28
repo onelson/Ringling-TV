@@ -27,6 +27,7 @@
 		<source src="{{object.ogv}}" type="video/ogg" />
 		<a href="{{object.mp4}}" id="player" class="vid"></a>
 	</video>
+	<pre>{{object.get_info|pprint}}</pre>
 	<div class="dcore">
 		{% include 'rtv/dublin_core.html' %}	
 	</div>
