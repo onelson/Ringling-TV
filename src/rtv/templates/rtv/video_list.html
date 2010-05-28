@@ -21,6 +21,7 @@
 		<td>
 			<a href="{{object.get_absolute_url}}">view</a>
 			<a href="{% url rtv:video_update pid=object.pid %}">edit</a>
+			<span class="state-control" pid="{{object.pid}}">
 			{% if object.state == 'A' %}
 			<a href="{% url rtv:video_state pid=object.pid state='I' %}">deactivate</a>
 			<a href="{% url rtv:video_state pid=object.pid state='D' %}">delete</a>
@@ -33,6 +34,7 @@
 			<a href="{% url rtv:video_state pid=object.pid state='A' %}">activate</a>
 			<a href="{% url rtv:video_state pid=object.pid state='I' %}">deactivate</a>
 			{% endif %}
+			</span>
 			<a href="{% url rtv:video_delete pid=object.pid %}">purge (delete for real)</a>
 		</td>
 	</tr>
