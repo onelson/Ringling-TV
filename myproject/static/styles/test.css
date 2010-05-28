@@ -30,18 +30,25 @@ a {color:  #D1D1B3; }
 
  body {
  	background: #292929;
+	color: #F2E6B6;
+ }
+ 
+ h1 {
+ 	color: #5B7876;
+ }
+ h3 { 
+	 background-color: #5B7876;
+	 color: #412A22; 
+	 padding: 0.4em;
+	 padding-top: 1em; 
+	 border-bottom: 1px solid; }
+	 
+ h2, h4, th {
  	color: #F2E6B6;
  }
  
- h1, h3 {
- 	color: #5B7876;
- }
- 
- h2, h4, th {
- 	color: #8F9E8B;
- }
- 
- a {color:  #412A22; }
+ a { color: #8F9E8B; }
+ a:hover { color: #F2E6B6; text-shadow: 0px 0px 1.4em #ECE;  }
  		
 /* contrast
  *FAF7EC
