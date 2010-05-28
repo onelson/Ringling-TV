@@ -8,20 +8,20 @@
 		<th><!-- actions --></th>
 	</tr>
 	{% for object in object_list %}
-	<tr>
-		<td>
+	<tr class="{{ object.get_state_display }}" pid="{{ object.pid }}">
+		<td class="poster">
 			<img style="width:128px;height:auto;" src="{{ object.thumbnail }}" />
 		</td>
-		<td>{{ object.title }}</td>
-		<td>{{ object.creator }}</td>
-		<td>{{ object.date|date }}</td>
-		<td>
+		<td class="title">{{ object.title }}</td>
+		<td class="creator">{{ object.creator }}</td>
+		<td class="date">{{ object.date|date }}</td>
+		<td class="state">
 			{{ object.get_state_display }}
 		</td>
-		<td>
-			<a href="{{object.get_absolute_url}}">view</a>
+		<td class="actions">
+			<a href="{{ object.get_absolute_url }}">view</a>
 			<a href="{% url rtv:video_update pid=object.pid %}">edit</a>
-			<span class="state-control" pid="{{object.pid}}">
+			<span class="state-control">
 			{% if object.state == 'A' %}
 			<a href="{% url rtv:video_state pid=object.pid state='I' %}">deactivate</a>
 			<a href="{% url rtv:video_state pid=object.pid state='D' %}">delete</a>
@@ -35,7 +35,8 @@
 			<a href="{% url rtv:video_state pid=object.pid state='I' %}">deactivate</a>
 			{% endif %}
 			</span>
-			<a href="{% url rtv:video_delete pid=object.pid %}">purge (delete for real)</a>
+			<a href="{% url rtv:video_delete pid=object.pid %}" title="delete for real">purge</a>
 		</td>
 	</tr>
 	{% endfor %}
+</table>
