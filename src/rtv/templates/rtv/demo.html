@@ -1,23 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 {% if vid %}
-<style type="text/css">
-	.vid {
-		display:block;
-		width: {{vid.width}}px;
-		height: {{vid.height}}px;
-	}
-	dl#links {
-		position: absolute;
-		top: 60px;
-		left: 10px;
-		width: 160px;
-	}
-	div#feature {
-		margin-left: 180px;
-	}
-</style>
-
 <div id="feature">
 	<h2>{{vid.title|title}}</h2>
 	<h3>{{vid.date|date}}</h3>
@@ -61,3 +44,23 @@
 	flowplayer("player", "{{MEDIA_URL}}flowplayer/flowplayer-3.2.1.swf");
 </script>
 {% endblock content %}
+{% if vid %}
+{% block stylesheet %}
+<style type="text/css">
+	.vid {
+		display:block;
+		width: {{vid.width}}px;
+		height: {{vid.height}}px;
+	}
+	dl#links {
+		position: absolute;
+		top: 60px;
+		left: 10px;
+		width: 160px;
+	}
+	div#feature {
+		margin-left: 180px;
+	}
+</style>
+{% endblock stylesheet %}
+{% endif %}

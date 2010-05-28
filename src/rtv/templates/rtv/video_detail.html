@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-{% block content %}
 
+{% block stylesheet %}
 <style type="text/css">
 	.vid {
 		display:block;
@@ -18,7 +18,9 @@
 		margin-left: 180px;
 	}
 </style>
+{% endblock stylesheet %}
 
+{% block content %}
 <div id="feature">
 	<h2>{{object.title|title}}</h2>
 	<h3>{{object.date|date}}</h3>
