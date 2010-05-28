@@ -5,3 +5,17 @@
  * #93A897
  * #2D3D3B
  */
+
+ body {
+ 	background: #2D3D38;
+	color: #EDD9B0;
+ }
+h1, h3 {
+	color: #851713;
+} 
+
+h2, h4, th {
+	color: #93A897;
+}
+
+a {color:  #D1D1B3; }
