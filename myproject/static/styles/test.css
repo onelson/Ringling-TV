@@ -4,7 +4,7 @@
  * #D1D1B3
  * #93A897
  * #2D3D3B
- */
+ 
 
  body {
 	color: #EDD9B0;
@@ -18,3 +18,115 @@ h2, h4, th {
 }
 
 a {color:  #D1D1B3; }
+*/
+
+/* Dusty Petrol
+ *292929
+ *5B7876
+ *8F9E8B
+ *F2E6B6
+ *412A22
+*/
+
+ body {
+ 	background: #292929;
+ }
+ 
+ h1, h3 {
+ 	color: #5B7876;
+ }
+ 
+ h2, h4, th {
+ 	color: #8F9E8B;
+ }
+ 
+ a {color:  #412A22; }
+ 		
+/* contrast
+ *FAF7EC
+ *807969
+ *323B40
+ *451212
+ *9B1616
+
+ 
+  body {
+	color: #323B40;
+ }
+h1, h3 {
+	color: #9B1616;
+} 
+
+h2, h4, th {
+	color: #451212;
+}
+
+a {color:  #FAF7EC; }
+*/
+*/ Cool Grays
+ *686E75
+ *9BAAC1
+ *82787B
+ *E4F1DB
+ *AAC19B
+ 
+ body {
+	color: #82787B;
+ }
+h1, h3 {
+	color: #AAC19B;
+} 
+
+h2, h4, th {
+	color: #9BAAC1;
+}
+
+a {color:  #E4F1DB; }
+*/
+
+/* Optimist
+ *6C6E58
+ *3E423A
+ *417378
+ *A4CFBE
+ *F4F7D9
+ 
+ body {
+	color: #3E423A;
+ }
+h1, h3 {
+	color: #A4CFBE;
+} 
+
+h2, h4, th {
+	color: #417378;
+}
+
+a {color:  #F4F7D9; }
+*/
+
+/* Optimist
+ *6C6E58
+ *3E423A
+ *417378
+ *A4CFBE
+ *F4F7D9
+ 
+ body {
+	color: #3E423A;
+ }
+h1, h3 {
+	color: #A4CFBE;
+} 
+
+h2, h4, th {
+	color: #417378;
+}
+
+a {color:  #F4F7D9; }
+*/
+
+
+
+
+ 
