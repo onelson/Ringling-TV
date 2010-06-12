@@ -1,0 +1,14 @@
+/bin/
+/eggs/
+/parts/
+/downloads/
+/develop-eggs/
+/myproject/static/uploads/
+/myproject/tmp/*
+*.pyc
+*.egg-info
+*.log
+docs/Makefile
+docs/make.bat
+.installed.cfg
+.coverage
