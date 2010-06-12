@@ -5,11 +5,7 @@ Ok, so there are some tricks to getting this setup.
 3. Wait for buildout to download the fedora installer (as needed)
 4. Run bin/install_fedora
 
-Once setup, you can start the fedora server via bin/start_fedora
+Once setup, you can start the fedora server via ./start-fedora.bash
+After that you can start your django app server.
 
-Next, configure your myproject/local_settings.py
-
-You'll have to make sure ffmpeg and ffmpeg2theora are installed and their paths are configured in your settings (as RTV_FFMPEG, and RTV_FFMPEG2THEORA).
-You'll also have to make sure your MEDIA_URL is fully qualified (protocol://host..., eg http://localhost:8000/static/ for the local dev server).
-
-Once the config is setup, you should be able to run bin/test to confirm everything is in order.
+Don't forget to configure your myproject/local_settings.py before you runserver though!
